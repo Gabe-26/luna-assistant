@@ -1,0 +1,852 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Luna — Wood Department Assistant</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Mono:wght@400;500&family=Figtree:wght@400;500;600&display=swap" rel="stylesheet" />
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --bark:    #2C1A0E;
+    --bark-mid:#4A2E14;
+    --moss:    #3B6D11;
+    --moss-lt: #5A9A1A;
+    --sage:    #C0DD97;
+    --cream:   #F7F2EA;
+    --parchment: #EDE5D4;
+    --grain:   #D4C4A8;
+    --smoke:   #7A6A54;
+    --white:   #FDFAF5;
+    --shadow:  rgba(44,26,14,0.18);
+  }
+
+  html, body {
+    height: 100%;
+    background: var(--cream);
+    font-family: 'Figtree', sans-serif;
+    color: var(--bark);
+    overflow: hidden;
+  }
+
+  /* Wood grain texture overlay */
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background-image:
+      repeating-linear-gradient(
+        92deg,
+        transparent,
+        transparent 3px,
+        rgba(180,140,80,0.04) 3px,
+        rgba(180,140,80,0.04) 6px
+      ),
+      repeating-linear-gradient(
+        180deg,
+        transparent,
+        transparent 40px,
+        rgba(180,140,80,0.03) 40px,
+        rgba(180,140,80,0.03) 41px
+      );
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  .app {
+    position: relative;
+    z-index: 1;
+    display: grid;
+    grid-template-columns: 280px 1fr;
+    grid-template-rows: 100vh;
+    height: 100vh;
+  }
+
+  /* ── SIDEBAR ── */
+  .sidebar {
+    background: var(--bark);
+    display: flex;
+    flex-direction: column;
+    padding: 0;
+    overflow: hidden;
+    position: relative;
+  }
+
+  .sidebar::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: repeating-linear-gradient(
+      88deg,
+      transparent,
+      transparent 4px,
+      rgba(255,255,255,0.025) 4px,
+      rgba(255,255,255,0.025) 8px
+    );
+    pointer-events: none;
+  }
+
+  .sidebar-header {
+    padding: 32px 24px 24px;
+    border-bottom: 1px solid rgba(255,255,255,0.08);
+    position: relative;
+    z-index: 1;
+  }
+
+  .luna-mark {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    margin-bottom: 16px;
+  }
+
+  .luna-icon {
+    width: 52px;
+    height: 52px;
+    background: linear-gradient(135deg, var(--moss), var(--moss-lt));
+    border-radius: 16px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 26px;
+    flex-shrink: 0;
+    box-shadow: 0 4px 16px rgba(59,109,17,0.4);
+  }
+
+  .luna-name {
+    font-family: 'DM Serif Display', serif;
+    font-size: 28px;
+    color: var(--white);
+    line-height: 1;
+    letter-spacing: -0.5px;
+  }
+
+  .luna-sub {
+    font-size: 11px;
+    color: var(--grain);
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    margin-top: 3px;
+    font-weight: 500;
+  }
+
+  .status-pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    background: rgba(90,154,26,0.2);
+    border: 1px solid rgba(90,154,26,0.35);
+    border-radius: 99px;
+    padding: 4px 12px;
+    font-size: 11px;
+    color: var(--sage);
+    font-weight: 500;
+    letter-spacing: 0.5px;
+  }
+
+  .status-dot {
+    width: 6px;
+    height: 6px;
+    background: var(--sage);
+    border-radius: 50%;
+    animation: pulse 2.5s ease-in-out infinite;
+  }
+
+  @keyframes pulse {
+    0%, 100% { opacity: 1; transform: scale(1); }
+    50% { opacity: 0.4; transform: scale(0.8); }
+  }
+
+  .sidebar-section {
+    padding: 20px 24px 8px;
+    position: relative;
+    z-index: 1;
+  }
+
+  .sidebar-label {
+    font-size: 10px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: var(--smoke);
+    font-weight: 600;
+    margin-bottom: 10px;
+  }
+
+  .quick-btn {
+    display: block;
+    width: 100%;
+    text-align: left;
+    background: rgba(255,255,255,0.05);
+    border: 1px solid rgba(255,255,255,0.07);
+    border-radius: 10px;
+    padding: 10px 14px;
+    color: var(--grain);
+    font-size: 13px;
+    font-family: 'Figtree', sans-serif;
+    cursor: pointer;
+    margin-bottom: 6px;
+    transition: all 0.18s ease;
+    line-height: 1.4;
+  }
+
+  .quick-btn:hover {
+    background: rgba(255,255,255,0.1);
+    color: var(--white);
+    border-color: rgba(255,255,255,0.15);
+    transform: translateX(3px);
+  }
+
+  .quick-btn .q-icon {
+    display: inline-block;
+    margin-right: 8px;
+    font-size: 14px;
+  }
+
+  .sidebar-footer {
+    margin-top: auto;
+    padding: 20px 24px;
+    border-top: 1px solid rgba(255,255,255,0.06);
+    position: relative;
+    z-index: 1;
+  }
+
+  .dept-badge {
+    background: rgba(255,255,255,0.05);
+    border: 1px solid rgba(255,255,255,0.08);
+    border-radius: 10px;
+    padding: 12px 14px;
+    font-size: 11px;
+    color: var(--smoke);
+    line-height: 1.6;
+  }
+
+  .dept-badge strong {
+    display: block;
+    color: var(--grain);
+    font-size: 12px;
+    margin-bottom: 2px;
+    font-weight: 600;
+  }
+
+  /* ── MAIN CHAT ── */
+  .main {
+    display: flex;
+    flex-direction: column;
+    background: var(--white);
+    overflow: hidden;
+  }
+
+  .chat-topbar {
+    padding: 18px 28px;
+    border-bottom: 1px solid var(--parchment);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    background: var(--white);
+    flex-shrink: 0;
+  }
+
+  .chat-topbar-title {
+    font-family: 'DM Serif Display', serif;
+    font-size: 20px;
+    color: var(--bark);
+    font-style: italic;
+  }
+
+  .chat-topbar-title span {
+    font-style: normal;
+    color: var(--moss);
+  }
+
+  .clear-btn {
+    font-size: 12px;
+    color: var(--smoke);
+    background: none;
+    border: 1px solid var(--grain);
+    border-radius: 8px;
+    padding: 6px 14px;
+    cursor: pointer;
+    font-family: 'Figtree', sans-serif;
+    font-weight: 500;
+    transition: all 0.15s;
+  }
+
+  .clear-btn:hover {
+    border-color: var(--bark-mid);
+    color: var(--bark);
+    background: var(--parchment);
+  }
+
+  .messages {
+    flex: 1;
+    overflow-y: auto;
+    padding: 28px;
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    scroll-behavior: smooth;
+  }
+
+  .messages::-webkit-scrollbar { width: 4px; }
+  .messages::-webkit-scrollbar-track { background: transparent; }
+  .messages::-webkit-scrollbar-thumb { background: var(--grain); border-radius: 4px; }
+
+  .msg-row {
+    display: flex;
+    gap: 14px;
+    align-items: flex-start;
+    animation: fadeUp 0.3s ease forwards;
+  }
+
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(10px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+
+  .msg-row.user {
+    flex-direction: row-reverse;
+  }
+
+  .avatar {
+    width: 36px;
+    height: 36px;
+    border-radius: 12px;
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 15px;
+    font-weight: 600;
+  }
+
+  .avatar.luna {
+    background: linear-gradient(135deg, var(--bark), var(--bark-mid));
+    color: var(--sage);
+    font-family: 'DM Serif Display', serif;
+    font-size: 16px;
+  }
+
+  .avatar.user {
+    background: var(--parchment);
+    color: var(--bark-mid);
+    font-size: 13px;
+    font-weight: 700;
+  }
+
+  .bubble {
+    max-width: 72%;
+    padding: 14px 18px;
+    border-radius: 4px 18px 18px 18px;
+    font-size: 14.5px;
+    line-height: 1.7;
+    position: relative;
+  }
+
+  .msg-row.luna .bubble {
+    background: var(--parchment);
+    color: var(--bark);
+    border: 1px solid var(--grain);
+    border-radius: 4px 18px 18px 18px;
+  }
+
+  .msg-row.user .bubble {
+    background: var(--bark);
+    color: var(--cream);
+    border-radius: 18px 4px 18px 18px;
+  }
+
+  /* Markdown-style formatting inside bubbles */
+  .bubble strong { font-weight: 600; }
+  .bubble ul { padding-left: 18px; margin: 6px 0; }
+  .bubble ul li { margin: 3px 0; }
+  .bubble code {
+    font-family: 'DM Mono', monospace;
+    font-size: 12.5px;
+    background: rgba(44,26,14,0.08);
+    padding: 1px 5px;
+    border-radius: 4px;
+  }
+  .msg-row.user .bubble code {
+    background: rgba(255,255,255,0.12);
+  }
+
+  .typing-indicator {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    padding: 14px 18px;
+    background: var(--parchment);
+    border: 1px solid var(--grain);
+    border-radius: 4px 18px 18px 18px;
+    width: fit-content;
+  }
+
+  .typing-indicator span {
+    width: 7px;
+    height: 7px;
+    border-radius: 50%;
+    background: var(--smoke);
+    animation: bounce 1.2s ease-in-out infinite;
+  }
+  .typing-indicator span:nth-child(2) { animation-delay: 0.2s; }
+  .typing-indicator span:nth-child(3) { animation-delay: 0.4s; }
+
+  @keyframes bounce {
+    0%, 80%, 100% { transform: translateY(0); opacity: 0.5; }
+    40%           { transform: translateY(-7px); opacity: 1; }
+  }
+
+  /* ── INPUT AREA ── */
+  .input-area {
+    padding: 20px 28px 24px;
+    border-top: 1px solid var(--parchment);
+    background: var(--white);
+    flex-shrink: 0;
+  }
+
+  .input-row {
+    display: flex;
+    gap: 10px;
+    align-items: flex-end;
+    background: var(--parchment);
+    border: 1.5px solid var(--grain);
+    border-radius: 16px;
+    padding: 10px 10px 10px 18px;
+    transition: border-color 0.2s;
+  }
+
+  .input-row:focus-within {
+    border-color: var(--moss);
+    box-shadow: 0 0 0 3px rgba(59,109,17,0.1);
+  }
+
+  #chat-input {
+    flex: 1;
+    border: none;
+    background: transparent;
+    font-family: 'Figtree', sans-serif;
+    font-size: 14.5px;
+    color: var(--bark);
+    resize: none;
+    outline: none;
+    line-height: 1.6;
+    max-height: 140px;
+    min-height: 24px;
+  }
+
+  #chat-input::placeholder { color: var(--smoke); }
+
+  #send-btn {
+    width: 42px;
+    height: 42px;
+    background: var(--moss);
+    border: none;
+    border-radius: 12px;
+    color: white;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    transition: all 0.15s;
+    font-size: 18px;
+  }
+
+  #send-btn:hover { background: var(--moss-lt); transform: scale(1.05); }
+  #send-btn:active { transform: scale(0.97); }
+  #send-btn:disabled { background: var(--grain); cursor: not-allowed; transform: none; }
+
+  .input-hint {
+    font-size: 11px;
+    color: var(--smoke);
+    margin-top: 8px;
+    text-align: center;
+    letter-spacing: 0.3px;
+  }
+
+  /* ── WELCOME STATE ── */
+  .welcome-card {
+    background: linear-gradient(135deg, var(--bark) 0%, var(--bark-mid) 100%);
+    border-radius: 20px;
+    padding: 28px;
+    color: var(--cream);
+    margin-bottom: 4px;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .welcome-card::before {
+    content: '🌲';
+    position: absolute;
+    right: 20px;
+    top: 50%;
+    transform: translateY(-50%);
+    font-size: 80px;
+    opacity: 0.12;
+  }
+
+  .welcome-card h2 {
+    font-family: 'DM Serif Display', serif;
+    font-size: 22px;
+    margin-bottom: 8px;
+    font-style: italic;
+  }
+
+  .welcome-card p {
+    font-size: 14px;
+    line-height: 1.7;
+    color: var(--grain);
+    max-width: 480px;
+  }
+
+  /* responsive */
+  @media (max-width: 700px) {
+    .app { grid-template-columns: 1fr; grid-template-rows: auto 1fr; }
+    .sidebar { grid-row: 1; max-height: 200px; flex-direction: row; flex-wrap: wrap; overflow: auto; }
+    .sidebar-footer { display: none; }
+  }
+</style>
+</head>
+<body>
+<div class="app">
+
+  <!-- SIDEBAR -->
+  <aside class="sidebar">
+    <div class="sidebar-header">
+      <div class="luna-mark">
+        <div class="luna-icon">🌲</div>
+        <div>
+          <div class="luna-name">Luna</div>
+          <div class="luna-sub">Wood Dept. Assistant</div>
+        </div>
+      </div>
+      <div class="status-pill">
+        <div class="status-dot"></div>
+        Online &amp; Ready
+      </div>
+    </div>
+
+    <div class="sidebar-section">
+      <div class="sidebar-label">Quick Questions</div>
+      <button class="quick-btn" onclick="ask('What wood species do we carry and what are they used for?')">
+        <span class="q-icon">🪵</span>Wood species we stock
+      </button>
+      <button class="quick-btn" onclick="ask('Walk me through the dog-ear panel assembly steps')">
+        <span class="q-icon">🔨</span>Dog-ear assembly steps
+      </button>
+      <button class="quick-btn" onclick="ask('What are the standard fence heights and post sizes?')">
+        <span class="q-icon">📐</span>Standard dimensions
+      </button>
+      <button class="quick-btn" onclick="ask('How deep should fence posts be set and how much concrete do I need?')">
+        <span class="q-icon">🪵</span>Post depth &amp; concrete guide
+      </button>
+      <button class="quick-btn" onclick="ask('What fasteners should I use with pressure treated lumber?')">
+        <span class="q-icon">🔩</span>Fasteners for PT wood
+      </button>
+      <button class="quick-btn" onclick="ask('A board looks warped or cupped — what do I do with it?')">
+        <span class="q-icon">⚠️</span>Dealing with defects
+      </button>
+      <button class="quick-btn" onclick="ask('What is the item code for a Colorado 6ft cedar dog-ear panel?')">
+        <span class="q-icon">🔢</span>Look up an item code
+      </button>
+      <button class="quick-btn" onclick="ask('What is the difference between ACQ and white cedar posts?')">
+        <span class="q-icon">📋</span>ACQ vs cedar posts
+      </button>
+    </div>
+
+    <div class="sidebar-footer">
+      <div class="dept-badge">
+        <strong>🏭 Wood Department</strong>
+        Wholesale Fence Company<br/>
+        Knowledge base: Notion KB<br/>
+        <span style="color:var(--sage);font-size:10px;">Powered by Claude AI</span>
+      </div>
+    </div>
+  </aside>
+
+  <!-- MAIN -->
+  <main class="main">
+    <div class="chat-topbar">
+      <div class="chat-topbar-title">Ask <span>Luna</span> anything about the wood department</div>
+      <button class="clear-btn" onclick="clearChat()">Clear chat</button>
+    </div>
+
+    <div class="messages" id="messages">
+      <div class="msg-row luna" id="welcome-msg">
+        <div class="avatar luna">L</div>
+        <div>
+          <div class="welcome-card">
+            <h2>Hey, I'm Luna 👋</h2>
+            <p>I'm your wood department assistant. Ask me about wood species, panel assembly, item codes, post installation, defects, fasteners — anything on the shop floor. I've got the full product catalog loaded and I'm ready to help.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="input-area">
+      <div class="input-row">
+        <textarea id="chat-input" placeholder="Ask Luna about wood types, assembly, item codes, defects…" rows="1" oninput="autoResize(this)" onkeydown="handleKey(event)"></textarea>
+        <button id="send-btn" onclick="sendMsg()" title="Send">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
+        </button>
+      </div>
+      <div class="input-hint">Press Enter to send · Shift+Enter for new line</div>
+    </div>
+  </main>
+</div>
+
+<script>
+const SYSTEM = `You are Luna, the AI assistant for the Wood Fencing Department of a wholesale fence company. You are a knowledgeable, practical colleague — friendly, direct, and shop-floor smart. You speak like someone who actually works with wood every day, not like a corporate chatbot.
+
+You have deep knowledge of:
+
+WOOD SPECIES & MATERIALS:
+- Pressure-Treated Pine (PT): UC3B (above ground), UC4A (ground contact residential posts), UC4B (heavy duty/commercial posts). Always use hot-dipped galvanized or stainless fasteners. Green tint is normal. Never burn PT offcuts. Wash hands after handling.
+- Cedar: Naturally rot/insect resistant. Stainless or HDG fasteners. Weathers silver-gray if unfinished.
+- Spruce/SPF: Budget option, low rot resistance, best above ground only, seal before install.
+- Redwood: Premium, naturally rot resistant, stainless fasteners only, mostly special orders.
+- White Cedar & Red Cedar: Used for posts and rails. Various sizes from 4"x4" to 6"x6", lengths 7' to 12'.
+- Locust: Split rail fencing, very durable naturally.
+- Moisture content target: 19% or below for installation.
+
+PRODUCT LINE & ITEM CODES (company catalog):
+The company names fence panels after US states. Key naming conventions:
+- WCO = Colorado style panels (standard privacy, vertical pickets, 2-rail)
+- WPA = Pennsylvania style (board-on-board/shadowbox feel, popular with doweled rail options)
+- WNE = Nebraska style (with scalloped/crowned top options)
+- WOK = Oklahoma style (T&G horizontal, available in many heights 3'-8', topper combos)
+- WNM = New Mexico style (T&G horizontal)
+- WUT = Utah style (T&G horizontal)
+- WND = North Dakota style (horizontal panels)
+- WFL = Florida style (horizontal T&G)
+- WHI = Hawaii style (horizontal panels)
+- WMA = Massachusetts style (with scalloped/crowned variants)
+- WIL = Illinois style (scalloped variants, 3-rail for 6')
+- WMD = Maryland style (scalloped and crowned variants)
+- WRI = Rhode Island style
+- WSC = South Carolina style
+- WNC = North Carolina style
+- WVT = Vermont style
+- WNY = New York style
+- WNH = New Hampshire style
+- WKY = Kentucky style
+- WMN = Minnesota style
+- WMO = Missouri style
+- WMT = Montana style
+- WTN = Tennessee style
+- WDE = Delaware style
+- WBW = Basketweave
+- WAZ = Arizona style (open picket)
+- WNV = Nevada style (horizontal)
+- WCT = Connecticut style
+- WFI = Fire Island style
+- WLO = Louver style
+
+CODE SUFFIXES:
+- No suffix / base = standard spruce rails
+- CBR = Cedar rails version
+- -16 = 1x6 boards instead of standard
+- -9 = Dog-ear picket version
+- -80 = Scalloped top
+- -81 = Crowned top
+- -23DR / -24DR = 2x3 or 2x4 Doweled rail
+- CUS = Custom order
+- G at end = Gate version (e.g. WCOG64 = Colorado 6'x47" gate)
+- Heights: 3=3ft, 4=4ft, 5=5ft, 6=6ft, 7=7ft, 8=8ft
+- Gate widths: 4=47", 5=59", 3=35"
+
+STOCKADE:
+- SS = Spruce Stockade (SS4, SS5, SS6, SS8)
+- CS = Cedar Stockade (CS4 through CS8, CBR versions for cedar rails)
+- CSP = Cedar Stockade Picket Only
+
+POSTS:
+- ACQ = Pressure-treated ACQ posts (4x4 and 5x5, lengths 6'-16', top styles: flat, Alaskan, Floridian, Hawaiian, Virginian)
+- WC = White Cedar posts (4x4 and 5x5, lengths 7'-12')
+- RC = Red Cedar posts
+- Post top styles: Flat Top (standard), Alaskan (pointed), Floridian (beveled), Hawaiian (hip), Virginian (decorative)
+- Code suffix A=Alaskan, F=Floridian, H=Hawaiian, V=Virginian
+
+SPLIT RAIL:
+- LSR = Locust Split Rail (2-hole and 3-hole posts, 11' rails, gate sets)
+- PSR = PT Split Rail
+- Round Cedar P&R: RC2HC/RC3HC etc. (2-hole or 3-hole, corner/end/line)
+- Doweled Round Cedar: DRC series
+
+GATES:
+- Named same as panels + G + dimensions (e.g. WCOG64 = Colorado 6'x47" gate)
+- Width codes: 4=47", 5=59", 3=35"
+- Oklahoma gates have extensive topper combos: -2DL (diagonal lattice), -2SL (square lattice), -CS (closed spindle), -OS (open spindle), -OSS (scalloped open spindle)
+
+TOPPERS:
+- WT12, WT18, WT24 = 12", 18", 24" tall toppers
+- Styles: 1DL/2DL/4DL (diagonal lattice spacings), 1SL/2SL/4SL (square lattice), CC (Carolina closed), CS (closed spindle), OS (open spindle), RI (Rhode Island), CT (Connecticut), AZC/AZO (Arizona closed/open spindle)
+
+ARBORS & PERGOLAS:
+- WARCH = Arbor tops (36", 42", 48", 60", 72" wide)
+- WDELARB = Deluxe arbors with lattice legs
+- WPER = Pergolas (48", 60", 72")
+- WHALO = Wood Halo arch pieces
+
+LATTICE:
+- W1DL/W2DL/W4DL = Diagonal lattice (1", 2", 4" spacing)
+- W1SL/W2SL/W4SL = Square lattice (1", 2", 4" spacing)
+- Available in 4', 5', 6' heights
+
+ASSEMBLY SOPs:
+- Dog-ear: Top rail 6" from top, bottom rail 8" from bottom. 2 nails/screws per rail per picket. Standard gap 1/4". Check square by measuring diagonals.
+- Shadowbox: Alternating pickets front/back, 3 rails for 6'+ panels.
+- Board-on-board: 1" overlap typical, mark overlap line on rail first.
+- Quality check: square, no loose fasteners, no split pickets, correct picket count.
+
+POST INSTALLATION:
+- Rule: bury 1/3 of post length + 6". 
+- 4ft fence = 8ft post, bury 2'8". 6ft fence = 10ft post, bury 3'4". 8ft fence = 12ft post, bury 4ft.
+- Hole diameter = 3x post width. 4x4 post = 12" hole. 6x6 = 18" hole.
+- Add 6" gravel at bottom. Set post, plumb on 2 sides, brace. Crown concrete away from post.
+- 24-48 hours cure before attaching rails.
+
+FASTENERS:
+- PT lumber: Hot-dipped galvanized (HDG) or stainless ONLY. Never plain steel.
+- Cedar/Redwood: Stainless or HDG.
+- Spruce/SPF untreated: Galvanized or coated.
+- Nails: Ring-shank 8d (2.5") or 10d (3") for picket-to-rail. Smooth shank has lowest hold.
+- Screws: #8 x 1-5/8" or 2" picket-to-rail, #10 x 3" rail-to-post.
+- Staples: 1-3/4" to 2" galvanized for pneumatic staplers.
+
+COMMON DEFECTS:
+- Knots: Small tight = ok. Large loose/dead knots = pull from line.
+- Warping/bowing: Slight = may use. Severe = reject.
+- Cupping: Mild ok for rails. Reject cupped pickets for privacy panels.
+- Checking/cracking: Surface checks normal in PT. Deep through-checks = reject.
+- Split ends: Trim if length allows, otherwise reject.
+- Blue stain: Cosmetic only, doesn't affect strength. Flag for premium orders.
+
+If asked about pricing, say the office handles pricing.
+If asked about something outside wood department (metal, PVC), say that's outside your area and suggest asking the relevant department.
+Keep answers practical and concise. Use bullet points for steps and specs. Be direct like a helpful coworker, not a formal document.`;
+
+let history = [];
+let isLoading = false;
+
+function autoResize(el) {
+  el.style.height = 'auto';
+  el.style.height = Math.min(el.scrollHeight, 140) + 'px';
+}
+
+function handleKey(e) {
+  if (e.key === 'Enter' && !e.shiftKey) {
+    e.preventDefault();
+    sendMsg();
+  }
+}
+
+function formatText(text) {
+  return text
+    .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
+    .replace(/\*(.*?)\*/g, '<em>$1</em>')
+    .replace(/`([^`]+)`/g, '<code>$1</code>')
+    .replace(/^- (.+)/gm, '<li>$1</li>')
+    .replace(/(<li>.*<\/li>)/gs, '<ul>$1</ul>')
+    .replace(/\n\n/g, '</p><p>')
+    .replace(/\n/g, '<br/>');
+}
+
+function addMsg(role, text) {
+  const msgs = document.getElementById('messages');
+  const row = document.createElement('div');
+  row.className = `msg-row ${role}`;
+  row.innerHTML = `
+    <div class="avatar ${role}">${role === 'luna' ? 'L' : 'U'}</div>
+    <div class="bubble">${formatText(text)}</div>
+  `;
+  msgs.appendChild(row);
+  msgs.scrollTop = msgs.scrollHeight;
+}
+
+function addTyping() {
+  const msgs = document.getElementById('messages');
+  const row = document.createElement('div');
+  row.className = 'msg-row luna';
+  row.id = 'typing-row';
+  row.innerHTML = `
+    <div class="avatar luna">L</div>
+    <div class="typing-indicator"><span></span><span></span><span></span></div>
+  `;
+  msgs.appendChild(row);
+  msgs.scrollTop = msgs.scrollHeight;
+}
+
+async function ask(text) {
+  if (isLoading) return;
+  const input = document.getElementById('chat-input');
+  input.value = '';
+  input.style.height = 'auto';
+  await sendText(text);
+}
+
+async function sendMsg() {
+  const input = document.getElementById('chat-input');
+  const text = input.value.trim();
+  if (!text || isLoading) return;
+  input.value = '';
+  input.style.height = 'auto';
+  await sendText(text);
+}
+
+async function sendText(text) {
+  isLoading = true;
+  document.getElementById('send-btn').disabled = true;
+
+  addMsg('user', text);
+  history.push({ role: 'user', content: text });
+  addTyping();
+
+  try {
+    const res = await fetch('https://api.anthropic.com/v1/messages', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        model: 'claude-sonnet-4-20250514',
+        max_tokens: 1000,
+        system: SYSTEM,
+        messages: history
+      })
+    });
+
+    const data = await res.json();
+    const reply = data.content?.[0]?.text || "Sorry, I had trouble responding. Try again!";
+    document.getElementById('typing-row')?.remove();
+    addMsg('luna', reply);
+    history.push({ role: 'assistant', content: reply });
+  } catch(e) {
+    document.getElementById('typing-row')?.remove();
+    addMsg('luna', "Something went wrong on my end. Check your connection and try again.");
+  }
+
+  isLoading = false;
+  document.getElementById('send-btn').disabled = false;
+  document.getElementById('chat-input').focus();
+}
+
+function clearChat() {
+  const msgs = document.getElementById('messages');
+  msgs.innerHTML = `
+    <div class="msg-row luna" id="welcome-msg">
+      <div class="avatar luna">L</div>
+      <div>
+        <div class="welcome-card">
+          <h2>Hey, I'm Luna 👋</h2>
+          <p>I'm your wood department assistant. Ask me about wood species, panel assembly, item codes, post installation, defects, fasteners — anything on the shop floor. I've got the full product catalog loaded and I'm ready to help.</p>
+        </div>
+      </div>
+    </div>
+  `;
+  history = [];
+}
+
+document.getElementById('chat-input').focus();
+</script>
+</body>
+</html>
