@@ -735,9 +735,20 @@ let history = [];
 let isLoading = false;
 let unknownLog = JSON.parse(localStorage.getItem('luna_unknown_log') || '[]');
 
-function logUnknown(question) {
+async function logUnknown(question) {
+  // Also save locally as backup
   unknownLog.push({ q: question, t: new Date().toLocaleString() });
   localStorage.setItem('luna_unknown_log', JSON.stringify(unknownLog));
+  // Log to Notion via Cloudflare Worker
+  try {
+    await fetch('https://luna-proxy.gabrieltoribio6.workers.dev/', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ _logUnknown: question })
+    });
+  } catch(e) {
+    console.log('Could not log to Notion:', e);
+  }
 }
 
 function showLog() {
