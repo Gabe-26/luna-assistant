@@ -277,6 +277,24 @@
     color: var(--bark);
     background: var(--parchment);
   }
+  .log-btn {
+    font-size: 12px;
+    color: var(--smoke);
+    background: none;
+    border: 1px solid var(--grain);
+    border-radius: 8px;
+    padding: 6px 14px;
+    cursor: pointer;
+    font-family: 'Figtree', sans-serif;
+    font-weight: 500;
+    transition: all 0.15s;
+    margin-right: 8px;
+  }
+  .log-btn:hover {
+    border-color: var(--moss);
+    color: var(--moss);
+    background: var(--parchment);
+  }
 
   .messages {
     flex: 1;
@@ -477,7 +495,7 @@
   }
 
   .welcome-card::before {
-    content: '🌲';
+    content: '🔨';
     position: absolute;
     right: 20px;
     top: 50%;
@@ -515,7 +533,7 @@
   <aside class="sidebar">
     <div class="sidebar-header">
       <div class="luna-mark">
-        <div class="luna-icon">🌲</div>
+        <div class="luna-icon">🔨</div>
         <div>
           <div class="luna-name">Luna</div>
           <div class="luna-sub">Wood Dept. Assistant</div>
@@ -529,39 +547,9 @@
 
     <div class="sidebar-section">
       <div class="sidebar-label">Quick Questions</div>
-      <button class="quick-btn" onclick="ask('What wood species do we carry and what are they used for?')">
-        <span class="q-icon">🪵</span>Wood species we stock
-      </button>
-      <button class="quick-btn" onclick="ask('Walk me through the dog-ear panel assembly steps')">
-        <span class="q-icon">🔨</span>Dog-ear assembly steps
-      </button>
-      <button class="quick-btn" onclick="ask('What are the standard fence heights and post sizes?')">
-        <span class="q-icon">📐</span>Standard dimensions
-      </button>
-      <button class="quick-btn" onclick="ask('How deep should fence posts be set and how much concrete do I need?')">
-        <span class="q-icon">🪵</span>Post depth &amp; concrete guide
-      </button>
-      <button class="quick-btn" onclick="ask('What fasteners should I use with pressure treated lumber?')">
-        <span class="q-icon">🔩</span>Fasteners for PT wood
-      </button>
-      <button class="quick-btn" onclick="ask('A board looks warped or cupped — what do I do with it?')">
-        <span class="q-icon">⚠️</span>Dealing with defects
-      </button>
-      <button class="quick-btn" onclick="ask('What is the item code for a Colorado 6ft cedar dog-ear panel?')">
-        <span class="q-icon">🔢</span>Look up an item code
-      </button>
-      <button class="quick-btn" onclick="ask('What is the difference between ACQ and white cedar posts?')">
-        <span class="q-icon">📋</span>ACQ vs cedar posts
-      </button>
     </div>
 
     <div class="sidebar-footer">
-      <div class="dept-badge">
-        <strong>🏭 Wood Department</strong>
-        Wholesale Fence Company<br/>
-        Knowledge base: Notion KB<br/>
-        <span style="color:var(--sage);font-size:10px;">Powered by Claude AI</span>
-      </div>
     </div>
   </aside>
 
@@ -725,10 +713,33 @@ COMMON DEFECTS:
 
 If asked about pricing, say the office handles pricing.
 If asked about something outside wood department (metal, PVC), say that's outside your area and suggest asking the relevant department.
-Keep answers practical and concise. Use bullet points for steps and specs. Be direct like a helpful coworker, not a formal document.`;
+Keep answers practical and concise. Use bullet points for steps and specs. Be direct like a helpful coworker, not a formal document.
+
+CRITICAL RULE - UNCERTAINTY:
+You must only answer questions you are fully certain about based on your knowledge base.
+If you are not 100% sure of the answer, do NOT guess or make anything up. Instead respond with exactly this message:
+"I'm not sure about that one. For accurate information, please contact someone in the Wood Department directly - Dept. ext: [EXT_PLACEHOLDER]"
+Then on a new line write: UNKNOWN_QUESTION: followed by the exact question that was asked.
+It is always better to say you do not know than to give wrong information on the shop floor.`;
 
 let history = [];
 let isLoading = false;
+let unknownLog = JSON.parse(localStorage.getItem('luna_unknown_log') || '[]');
+
+function logUnknown(question) {
+  unknownLog.push({ q: question, t: new Date().toLocaleString() });
+  localStorage.setItem('luna_unknown_log', JSON.stringify(unknownLog));
+}
+
+function showLog() {
+  const log = JSON.parse(localStorage.getItem('luna_unknown_log') || '[]');
+  if (log.length === 0) { alert('No unanswered questions logged yet!'); return; }
+  let txt = '=== LUNA - UNANSWERED QUESTIONS LOG ===\n\n';
+  log.forEach((entry, i) => { txt += (i+1) + '. [' + entry.t + ']\n   ' + entry.q + '\n\n'; });
+  const win = window.open('', '_blank');
+  win.document.write('<pre style="font-family:monospace;font-size:15px;padding:32px;white-space:pre-wrap;max-width:800px;">' + txt + '<\/pre>');
+  win.document.title = 'Luna - Unanswered Questions';
+}
 
 function autoResize(el) {
   el.style.height = 'auto';
@@ -820,6 +831,11 @@ async function sendText(text) {
     document.getElementById('typing-row')?.remove();
     addMsg('luna', reply);
     history.push({ role: 'assistant', content: reply });
+    // Log unknown questions
+    if (reply.includes('UNKNOWN_QUESTION:')) {
+      const match = reply.match(/UNKNOWN_QUESTION:\s*(.+)/);
+      if (match) logUnknown(match[1].trim());
+    }
   } catch(e) {
     document.getElementById('typing-row')?.remove();
     addMsg('luna', "Something went wrong on my end. Check your connection and try again.");
@@ -828,6 +844,13 @@ async function sendText(text) {
   isLoading = false;
   document.getElementById('send-btn').disabled = false;
   document.getElementById('chat-input').focus();
+
+// Secret admin shortcut: Ctrl+Shift+L to view unknown questions log
+document.addEventListener('keydown', function(e) {
+  if (e.ctrlKey && e.shiftKey && e.key === 'L') {
+    showLog();
+  }
+});
 }
 
 function clearChat() {
@@ -847,6 +870,13 @@ function clearChat() {
 }
 
 document.getElementById('chat-input').focus();
+
+// Secret admin shortcut: Ctrl+Shift+L to view unknown questions log
+document.addEventListener('keydown', function(e) {
+  if (e.ctrlKey && e.shiftKey && e.key === 'L') {
+    showLog();
+  }
+});
 </script>
 </body>
 </html>
