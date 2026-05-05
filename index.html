@@ -532,7 +532,6 @@
     </div>
   </div>
 
-  <textarea id="input" placeholder="Ask Luna about wood types, assembly, item codes, defects..." rows="1"></textarea>
   <div class="input-area">
     <textarea id="input" placeholder="Ask Luna about wood types, assembly, item codes, defects..." rows="1"></textarea>
     <button id="send-btn" onclick="sendMessage()">
@@ -747,6 +746,12 @@
           const q = match[1].trim();
           unknownLog.push({ q, user: currentUser, time: new Date().toLocaleString() });
           localStorage.setItem('luna_unknown', JSON.stringify(unknownLog));
+          // Also log to Notion with user name
+          fetch(WORKER_URL, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ _logUnknown: q, _user: currentUser })
+          }).catch(() => {});
         }
       }
 
