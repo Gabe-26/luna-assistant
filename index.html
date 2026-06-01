@@ -426,7 +426,53 @@
       flex-shrink: 0;
     }
  
-    /* Mic button */
+    /* Conversation mode button */
+    #convo-btn {
+      width: 100%;
+      padding: 11px;
+      background: transparent;
+      border: 1.5px solid var(--green);
+      border-radius: 12px;
+      color: var(--green-light);
+      font-family: 'DM Sans', sans-serif;
+      font-size: 14px;
+      font-weight: 500;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      transition: all 0.2s;
+      flex-shrink: 0;
+    }
+    #convo-btn:hover { background: var(--green-glow); }
+    #convo-btn.active {
+      background: rgba(196,90,90,0.15);
+      border-color: #c45a5a;
+      color: #c47a7a;
+      animation: convoPulse 2s infinite;
+    }
+    @keyframes convoPulse {
+      0%, 100% { box-shadow: 0 0 0 0 rgba(196,90,90,0.3); }
+      50% { box-shadow: 0 0 0 8px rgba(196,90,90,0); }
+    }
+ 
+    /* Speaking indicator in header */
+    #speaking-indicator {
+      display: none;
+      font-size: 11px;
+      color: var(--green-light);
+      align-items: center;
+      gap: 5px;
+    }
+    #speaking-indicator.show { display: flex; }
+    .speak-dot {
+      width: 6px; height: 6px; border-radius: 50%;
+      background: var(--green-light);
+      animation: bounce 1.2s infinite;
+    }
+    .speak-dot:nth-child(2) { animation-delay: 0.2s; }
+    .speak-dot:nth-child(3) { animation-delay: 0.4s; }
     #mic-btn {
       width: 46px;
       height: 46px;
@@ -583,6 +629,7 @@
         <span id="user-name-display">—</span>
       </div>
       <button id="voice-toggle" onclick="toggleVoice()" title="Toggle Luna's voice">🔇 Voice</button>
+      <div id="speaking-indicator"><div class="speak-dot"></div><div class="speak-dot"></div><div class="speak-dot"></div> Luna is speaking</div>
       <button class="clear-btn" onclick="clearChat()">Clear chat</button>
     </div>
   </div>
@@ -594,6 +641,9 @@
     </div>
   </div>
  
+  <div style="padding: 0 16px 10px; flex-shrink: 0;">
+    <button id="convo-btn" onclick="toggleConversation()">🎙️ Talk to Luna</button>
+  </div>
   <div class="input-area">
     <textarea id="input" placeholder="Ask Luna about wood types, assembly, item codes, defects..." rows="1"></textarea>
     <button id="mic-btn" onclick="toggleMic()" title="Hold to speak">🎤</button>
@@ -789,6 +839,7 @@
  
     showTyping();
     document.getElementById('send-btn').disabled = true;
+    if (conversationMode) stopMic();
  
     try {
       const res = await fetch(WORKER_URL, {
@@ -898,7 +949,8 @@
   }
  
   function lunaSpeak(text) {
-    if (!voiceOn || !hasSpeak) return;
+    if (!hasSpeak) return;
+    if (!voiceOn && !conversationMode) return;
     window.speechSynthesis.cancel();
     const clean = stripMarkdown(text);
     const utterance = new SpeechSynthesisUtterance(clean);
@@ -915,14 +967,61 @@
       (v.lang === 'en-US' && v.localService)
     );
     if (preferred) utterance.voice = preferred;
+ 
+    // Show speaking indicator
+    utterance.onstart = () => {
+      document.getElementById('speaking-indicator').classList.add('show');
+    };
+ 
+    // When Luna finishes speaking, auto-restart mic in conversation mode
+    utterance.onend = () => {
+      document.getElementById('speaking-indicator').classList.remove('show');
+      if (conversationMode) {
+        setTimeout(() => startMic(), 400);
+      }
+    };
+ 
     window.speechSynthesis.speak(utterance);
   }
  
   // Mic / speech-to-text
   let recognition = null;
   let isRecording = false;
+  let conversationMode = false;
  
-  function toggleMic() {
+  // ─── CONVERSATION MODE ────────────────────────────────────────
+  function toggleConversation() {
+    if (!hasMic || !hasSpeak) {
+      showUnsupported();
+      return;
+    }
+    if (conversationMode) {
+      stopConversation();
+    } else {
+      startConversation();
+    }
+  }
+ 
+  function startConversation() {
+    conversationMode = true;
+    voiceOn = true;
+    localStorage.setItem('luna_voice', 'true');
+    updateVoiceToggle();
+    const btn = document.getElementById('convo-btn');
+    btn.classList.add('active');
+    btn.textContent = '⏹️ End Conversation';
+    startMic();
+  }
+ 
+  function stopConversation() {
+    conversationMode = false;
+    window.speechSynthesis?.cancel();
+    stopMic();
+    const btn = document.getElementById('convo-btn');
+    btn.classList.remove('active');
+    btn.textContent = '🎙️ Talk to Luna';
+    document.getElementById('speaking-indicator').classList.remove('show');
+  }
     if (!hasMic) {
       showUnsupported();
       return;
