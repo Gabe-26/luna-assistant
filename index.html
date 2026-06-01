@@ -954,7 +954,13 @@
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ _tts: clean })
     })
-    .then(res => res.blob())
+    .then(res => {
+      const contentType = res.headers.get('Content-Type') || '';
+      if (!res.ok || !contentType.includes('audio')) {
+        throw new Error('TTS response was not audio');
+      }
+      return res.blob();
+    })
     .then(blob => {
       const audioUrl = URL.createObjectURL(blob);
       const audio = new Audio(audioUrl);
