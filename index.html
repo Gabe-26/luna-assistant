@@ -947,35 +947,39 @@
     const clean = stripMarkdown(text);
     if (!clean) return;
  
+    const VOICE_ID = 'MClEFoImJXBTgLwdLI5n'; // Ivy
+    const EL_KEY = 'sk_a4ba9bde7376ff9d7d35d3261738a864f252120003a6a54d';
+ 
     document.getElementById('speaking-indicator').classList.add('show');
  
-    fetch(WORKER_URL, {
+    fetch(`https://api.elevenlabs.io/v1/text-to-speech/${VOICE_ID}`, {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ _tts: clean })
+      headers: {
+        'xi-api-key': EL_KEY,
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        text: clean,
+        model_id: 'eleven_multilingual_v2',
+        voice_settings: { stability: 0.5, similarity_boost: 0.75 }
+      })
     })
     .then(res => {
-      const contentType = res.headers.get('Content-Type') || '';
-      if (!res.ok || !contentType.includes('audio')) {
-        throw new Error('TTS response was not audio');
-      }
+      if (!res.ok) throw new Error('ElevenLabs error');
       return res.blob();
     })
     .then(blob => {
       const audioUrl = URL.createObjectURL(blob);
       const audio = new Audio(audioUrl);
- 
       audio.onended = () => {
         document.getElementById('speaking-indicator').classList.remove('show');
         URL.revokeObjectURL(audioUrl);
         if (conversationMode) setTimeout(() => startMic(), 400);
       };
- 
       audio.onerror = () => {
         document.getElementById('speaking-indicator').classList.remove('show');
         if (conversationMode) setTimeout(() => startMic(), 400);
       };
- 
       audio.play();
     })
     .catch(() => {
