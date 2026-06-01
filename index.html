@@ -1022,6 +1022,8 @@
     btn.textContent = '🎙️ Talk to Luna';
     document.getElementById('speaking-indicator').classList.remove('show');
   }
+ 
+  function toggleMic() {
     if (!hasMic) {
       showUnsupported();
       return;
