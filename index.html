@@ -900,7 +900,6 @@
   // Check browser support
   const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
   const hasMic = !!SpeechRecognition;
-  const hasSpeak = !!window.speechSynthesis;
  
   // Disable mic button if not supported
   if (!hasMic) {
@@ -924,14 +923,9 @@
   }
  
   function toggleVoice() {
-    if (!hasSpeak) {
-      showUnsupported();
-      return;
-    }
     voiceOn = !voiceOn;
     localStorage.setItem('luna_voice', voiceOn);
     updateVoiceToggle();
-    if (!voiceOn) window.speechSynthesis.cancel();
   }
  
   // Strip markdown so Luna doesn't read asterisks aloud
@@ -949,39 +943,39 @@
   }
  
   function lunaSpeak(text) {
-    if (!hasSpeak) return;
     if (!voiceOn && !conversationMode) return;
-    window.speechSynthesis.cancel();
     const clean = stripMarkdown(text);
-    const utterance = new SpeechSynthesisUtterance(clean);
-    utterance.rate = 1.0;
-    utterance.pitch = 1.05;
-    utterance.volume = 1;
-    // Pick a natural-sounding voice if available
-    const voices = window.speechSynthesis.getVoices();
-    const preferred = voices.find(v =>
-      v.name.includes('Samantha') ||
-      v.name.includes('Karen') ||
-      v.name.includes('Google US English') ||
-      v.name.includes('Microsoft Aria') ||
-      (v.lang === 'en-US' && v.localService)
-    );
-    if (preferred) utterance.voice = preferred;
+    if (!clean) return;
  
-    // Show speaking indicator
-    utterance.onstart = () => {
-      document.getElementById('speaking-indicator').classList.add('show');
-    };
+    document.getElementById('speaking-indicator').classList.add('show');
  
-    // When Luna finishes speaking, auto-restart mic in conversation mode
-    utterance.onend = () => {
+    fetch(WORKER_URL, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ _tts: clean })
+    })
+    .then(res => res.blob())
+    .then(blob => {
+      const audioUrl = URL.createObjectURL(blob);
+      const audio = new Audio(audioUrl);
+ 
+      audio.onended = () => {
+        document.getElementById('speaking-indicator').classList.remove('show');
+        URL.revokeObjectURL(audioUrl);
+        if (conversationMode) setTimeout(() => startMic(), 400);
+      };
+ 
+      audio.onerror = () => {
+        document.getElementById('speaking-indicator').classList.remove('show');
+        if (conversationMode) setTimeout(() => startMic(), 400);
+      };
+ 
+      audio.play();
+    })
+    .catch(() => {
       document.getElementById('speaking-indicator').classList.remove('show');
-      if (conversationMode) {
-        setTimeout(() => startMic(), 400);
-      }
-    };
- 
-    window.speechSynthesis.speak(utterance);
+      if (conversationMode) setTimeout(() => startMic(), 400);
+    });
   }
  
   // Mic / speech-to-text
@@ -1015,7 +1009,6 @@
  
   function stopConversation() {
     conversationMode = false;
-    window.speechSynthesis?.cancel();
     stopMic();
     const btn = document.getElementById('convo-btn');
     btn.classList.remove('active');
@@ -1036,9 +1029,6 @@
   }
  
   function startMic() {
-    // Stop Luna speaking if she is
-    window.speechSynthesis?.cancel();
- 
     recognition = new SpeechRecognition();
     recognition.lang = 'en-US';
     recognition.interimResults = true;
@@ -1111,12 +1101,6 @@
     toast.style.display = 'block';
     setTimeout(() => { toast.style.display = 'none'; }, 3500);
   }
- 
-  // Load voices (Chrome loads them async)
-  if (window.speechSynthesis) {
-    window.speechSynthesis.onvoiceschanged = () => window.speechSynthesis.getVoices();
-  }
- 
  
   let keySeq = [];
   document.addEventListener('keydown', (e) => {
