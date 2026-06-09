@@ -1,0 +1,619 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Luna — Fence Code Import Tool</title>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@500;700&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg: #1a1612;
+      --bg2: #22201c;
+      --bg3: #2a2720;
+      --card: #2e2b24;
+      --border: #3d3a32;
+      --green: #6b8f5e;
+      --green-light: #8aad7b;
+      --green-glow: rgba(107,143,94,0.15);
+      --text: #e8e0d0;
+      --text-muted: #8a8070;
+      --text-dim: #5a5448;
+      --accent: #c4a55a;
+      --red: #c45a5a;
+      --red-light: #c47a7a;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: 'DM Sans', sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+      padding: 32px 20px;
+    }
+    .container { max-width: 860px; margin: 0 auto; display: flex; flex-direction: column; gap: 24px; }
+
+    .header { display: flex; align-items: center; gap: 14px; }
+    .header-icon {
+      width: 48px; height: 48px; background: var(--green);
+      border-radius: 12px; display: flex; align-items: center;
+      justify-content: center; font-size: 22px; flex-shrink: 0;
+    }
+    .header-title { font-family: 'Playfair Display', serif; font-size: 24px; font-weight: 700; }
+    .header-sub { font-size: 13px; color: var(--text-muted); margin-top: 3px; }
+
+    .card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 28px;
+    }
+    .card h2 {
+      font-family: 'Playfair Display', serif;
+      font-size: 17px; margin-bottom: 6px; color: var(--text);
+    }
+    .card p { font-size: 14px; color: var(--text-muted); line-height: 1.6; margin-bottom: 16px; }
+
+    /* Step indicators */
+    .steps { display: flex; gap: 8px; margin-bottom: 24px; }
+    .step-dot {
+      width: 28px; height: 28px; border-radius: 50%;
+      background: var(--bg3); border: 1px solid var(--border);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 12px; font-weight: 600; color: var(--text-dim);
+      flex-shrink: 0;
+    }
+    .step-dot.active { background: var(--green); border-color: var(--green); color: #fff; }
+    .step-dot.done { background: var(--bg3); border-color: var(--green); color: var(--green-light); }
+    .step-line { flex: 1; height: 1px; background: var(--border); margin: 14px 0; }
+
+    /* Config fields */
+    .field { display: flex; flex-direction: column; gap: 8px; margin-bottom: 16px; }
+    .field label { font-size: 12px; font-weight: 500; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.05em; }
+    .field input {
+      background: var(--bg2); border: 1.5px solid var(--border);
+      border-radius: 10px; color: var(--text);
+      font-family: 'DM Sans', sans-serif; font-size: 14px;
+      padding: 12px 14px; outline: none; transition: border-color 0.2s;
+    }
+    .field input:focus { border-color: var(--green); }
+    .field .hint { font-size: 12px; color: var(--text-dim); }
+
+    /* Drop zone */
+    #drop-zone {
+      border: 2px dashed var(--border);
+      border-radius: 12px;
+      padding: 40px 24px;
+      text-align: center;
+      cursor: pointer;
+      transition: all 0.2s;
+      background: var(--bg2);
+    }
+    #drop-zone:hover, #drop-zone.dragover {
+      border-color: var(--green);
+      background: var(--green-glow);
+    }
+    #drop-zone .drop-icon { font-size: 36px; margin-bottom: 12px; }
+    #drop-zone p { font-size: 14px; color: var(--text-muted); }
+    #drop-zone strong { color: var(--text); }
+    #file-input { display: none; }
+
+    /* Buttons */
+    .btn {
+      padding: 12px 24px; border-radius: 10px;
+      font-family: 'DM Sans', sans-serif; font-size: 14px;
+      font-weight: 500; cursor: pointer; border: none;
+      transition: all 0.2s; display: inline-flex; align-items: center; gap: 8px;
+    }
+    .btn-primary { background: var(--green); color: #fff; }
+    .btn-primary:hover { background: var(--green-light); }
+    .btn-primary:disabled { opacity: 0.4; cursor: not-allowed; }
+    .btn-outline { background: transparent; border: 1.5px solid var(--border); color: var(--text-muted); }
+    .btn-outline:hover { border-color: var(--green); color: var(--text); }
+    .btn-danger { background: rgba(196,90,90,0.15); border: 1.5px solid var(--red); color: var(--red-light); }
+    .btn-danger:hover { background: rgba(196,90,90,0.25); }
+
+    /* Progress */
+    .progress-bar-wrap {
+      background: var(--bg2); border-radius: 8px; height: 8px;
+      overflow: hidden; margin: 12px 0;
+    }
+    .progress-bar {
+      height: 100%; background: var(--green);
+      border-radius: 8px; transition: width 0.3s;
+      width: 0%;
+    }
+    #progress-text { font-size: 13px; color: var(--text-muted); }
+
+    /* Results table */
+    .results-header {
+      display: flex; justify-content: space-between;
+      align-items: center; margin-bottom: 16px; flex-wrap: gap;
+      gap: 12px;
+    }
+    .badge {
+      display: inline-flex; align-items: center; gap: 6px;
+      padding: 4px 12px; border-radius: 20px; font-size: 12px; font-weight: 500;
+    }
+    .badge-new { background: rgba(107,143,94,0.2); color: var(--green-light); border: 1px solid rgba(107,143,94,0.3); }
+    .badge-exists { background: rgba(90,84,72,0.3); color: var(--text-muted); border: 1px solid var(--border); }
+    .badge-error { background: rgba(196,90,90,0.15); color: var(--red-light); border: 1px solid rgba(196,90,90,0.3); }
+
+    table { width: 100%; border-collapse: collapse; font-size: 13px; }
+    thead th {
+      text-align: left; padding: 10px 12px;
+      color: var(--text-muted); font-weight: 500;
+      border-bottom: 1px solid var(--border);
+      font-size: 12px; text-transform: uppercase; letter-spacing: 0.04em;
+    }
+    tbody tr { border-bottom: 1px solid rgba(61,58,50,0.5); }
+    tbody tr:hover { background: rgba(107,143,94,0.05); }
+    tbody td { padding: 9px 12px; color: var(--text); }
+    .td-code { font-weight: 600; color: var(--accent); font-family: monospace; font-size: 13px; }
+    .td-status-new { color: var(--green-light); font-weight: 500; }
+    .td-status-exists { color: var(--text-dim); }
+    .td-status-error { color: var(--red-light); }
+    .td-cat { font-size: 11px; color: var(--text-muted); }
+
+    .table-wrap { max-height: 420px; overflow-y: auto; border-radius: 10px; border: 1px solid var(--border); }
+    .table-wrap::-webkit-scrollbar { width: 4px; }
+    .table-wrap::-webkit-scrollbar-thumb { background: var(--border); border-radius: 2px; }
+
+    /* Log */
+    #log {
+      background: var(--bg2); border: 1px solid var(--border);
+      border-radius: 10px; padding: 14px 16px;
+      font-size: 12px; color: var(--text-muted);
+      max-height: 160px; overflow-y: auto;
+      font-family: monospace; line-height: 1.8;
+    }
+    #log::-webkit-scrollbar { width: 4px; }
+    #log::-webkit-scrollbar-thumb { background: var(--border); border-radius: 2px; }
+    .log-ok { color: var(--green-light); }
+    .log-skip { color: var(--text-dim); }
+    .log-err { color: var(--red-light); }
+
+    /* Action row */
+    .action-row { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; }
+
+    /* Section label */
+    .section-label {
+      font-size: 11px; font-weight: 600; text-transform: uppercase;
+      letter-spacing: 0.07em; color: var(--text-dim); margin-bottom: 10px;
+    }
+
+    /* Hidden */
+    .hidden { display: none !important; }
+  </style>
+</head>
+<body>
+<div class="container">
+
+  <!-- Header -->
+  <div class="header">
+    <div class="header-icon">🌲</div>
+    <div>
+      <div class="header-title">Luna — Import Tool</div>
+      <div class="header-sub">Compare your company CSV against Notion and add only new fence codes</div>
+    </div>
+  </div>
+
+  <!-- Step indicators -->
+  <div class="steps">
+    <div class="step-dot active" id="dot-1">1</div>
+    <div class="step-line"></div>
+    <div class="step-dot" id="dot-2">2</div>
+    <div class="step-line"></div>
+    <div class="step-dot" id="dot-3">3</div>
+    <div class="step-line"></div>
+    <div class="step-dot" id="dot-4">4</div>
+  </div>
+
+  <!-- Step 1: Config -->
+  <div class="card" id="step-1">
+    <h2>Step 1 — Enter your Notion credentials</h2>
+    <p>These are used only to read and write your Fence Spec Sheets database. Nothing is stored — they stay in your browser only.</p>
+    <div class="field">
+      <label>Notion Integration Token</label>
+      <input type="password" id="notion-token" placeholder="ntn_..." autocomplete="off" />
+      <div class="hint">Found in Notion → Settings → Connections → your luna-logger integration</div>
+    </div>
+    <div class="field">
+      <label>Notion Database ID</label>
+      <input type="text" id="db-id" value="7b0b13b6fcc042178e3fda388e1cdcda" autocomplete="off" />
+      <div class="hint">Pre-filled with your Fence Spec Sheets database</div>
+    </div>
+    <button class="btn btn-primary" onclick="goToStep2()">Continue →</button>
+  </div>
+
+  <!-- Step 2: Upload CSV -->
+  <div class="card hidden" id="step-2">
+    <h2>Step 2 — Upload your company CSV</h2>
+    <p>Export the fence code list from your company's system and drop it here. The tool expects columns: <strong>Item Code, Description, Prod</strong>.</p>
+    <div id="drop-zone" onclick="document.getElementById('file-input').click()">
+      <div class="drop-icon">📂</div>
+      <p><strong>Click to browse</strong> or drag and drop your CSV here</p>
+      <p style="margin-top:6px; font-size:12px;">Only .csv files accepted</p>
+    </div>
+    <input type="file" id="file-input" accept=".csv" onchange="handleFile(event)" />
+    <div id="file-info" class="hidden" style="margin-top:14px; font-size:13px; color:var(--text-muted);"></div>
+  </div>
+
+  <!-- Step 3: Review -->
+  <div class="card hidden" id="step-3">
+    <h2>Step 3 — Review what will be added</h2>
+    <p>The tool has compared your CSV against Notion. Only <strong style="color:var(--green-light)">NEW</strong> codes are checked for import. Existing codes are skipped automatically.</p>
+
+    <div class="results-header">
+      <div style="display:flex; gap:8px; flex-wrap:wrap;">
+        <span class="badge badge-new">✅ <span id="count-new">0</span> New</span>
+        <span class="badge badge-exists">⏭️ <span id="count-exists">0</span> Already in Notion</span>
+        <span class="badge badge-error">⚠️ <span id="count-missing">0</span> No code (skipped)</span>
+      </div>
+      <div style="display:flex; gap:8px;">
+        <button class="btn btn-outline" onclick="filterTable('all')" id="filter-all">Show all</button>
+        <button class="btn btn-outline" onclick="filterTable('new')" id="filter-new">New only</button>
+      </div>
+    </div>
+
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th>Fence Code</th>
+            <th>Description</th>
+            <th>Prod #</th>
+            <th>Category</th>
+            <th>Status</th>
+          </tr>
+        </thead>
+        <tbody id="results-table"></tbody>
+      </table>
+    </div>
+
+    <div style="margin-top:20px;" class="action-row">
+      <button class="btn btn-primary" id="import-btn" onclick="startImport()">
+        ➕ Add <span id="import-count">0</span> new codes to Notion
+      </button>
+      <button class="btn btn-outline" onclick="resetTool()">Start over</button>
+    </div>
+  </div>
+
+  <!-- Step 4: Import progress -->
+  <div class="card hidden" id="step-4">
+    <h2>Step 4 — Importing to Notion</h2>
+    <p>Adding new codes one by one. Do not close this tab.</p>
+    <div class="progress-bar-wrap"><div class="progress-bar" id="progress-bar"></div></div>
+    <div id="progress-text">Starting...</div>
+    <div style="margin-top:16px;">
+      <div class="section-label">Activity Log</div>
+      <div id="log"></div>
+    </div>
+    <div id="done-msg" class="hidden" style="margin-top:20px;">
+      <div style="font-size:15px; color:var(--green-light); margin-bottom:12px;">✅ Import complete!</div>
+      <div class="action-row">
+        <button class="btn btn-primary" onclick="resetTool()">Import another CSV</button>
+        <a href="https://www.notion.so/7b0b13b6fcc042178e3fda388e1cdcda" target="_blank" class="btn btn-outline">Open Notion Database →</a>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<!-- Drag and drop -->
+<script>
+  const dropZone = document.getElementById('drop-zone');
+  dropZone.addEventListener('dragover', e => { e.preventDefault(); dropZone.classList.add('dragover'); });
+  dropZone.addEventListener('dragleave', () => dropZone.classList.remove('dragover'));
+  dropZone.addEventListener('drop', e => {
+    e.preventDefault();
+    dropZone.classList.remove('dragover');
+    const file = e.dataTransfer.files[0];
+    if (file && file.name.endsWith('.csv')) processCSV(file);
+    else alert('Please drop a .csv file.');
+  });
+</script>
+
+<script>
+  // ── State ──────────────────────────────────────────────────────
+  let notionToken = '';
+  let dbId = '';
+  let existingCodes = new Set();
+  let csvRows = [];         // All parsed rows from CSV
+  let comparedRows = [];    // Rows with status attached
+
+  // ── Step navigation ───────────────────────────────────────────
+  function setStep(n) {
+    [1,2,3,4].forEach(i => {
+      document.getElementById(`step-${i}`).classList.toggle('hidden', i !== n);
+      const dot = document.getElementById(`dot-${i}`);
+      dot.classList.toggle('active', i === n);
+      dot.classList.toggle('done', i < n);
+    });
+  }
+
+  function goToStep2() {
+    notionToken = document.getElementById('notion-token').value.trim();
+    dbId = document.getElementById('db-id').value.trim();
+    if (!notionToken || !dbId) { alert('Please fill in both fields.'); return; }
+    setStep(2);
+  }
+
+  // ── Category detector ─────────────────────────────────────────
+  // Uses fence code + description to guess Notion category
+  function detectCategory(code, desc) {
+    const c = (code || '').toUpperCase();
+    const d = (desc || '').toUpperCase();
+
+    // Gates first (code ends in G before numbers, or description says GATE)
+    if (d.includes('GATE') || /G\d{2}$/.test(c) || /G\d{2}CBR/.test(c)) {
+      // Post & Rail gate vs regular gate
+      if (d.includes('P&R') || d.includes('POST') && d.includes('RAIL')) return 'P&R Gate';
+      return 'Gates';
+    }
+    // Posts
+    if (d.includes('POST') || c.startsWith('ACQ') || c.startsWith('WCP') || c.startsWith('RCP')) return 'Posts';
+    // Locust
+    if (c.startsWith('LSR') || d.includes('LOCUST')) return 'locust';
+    // Split Rail / P&R Rail
+    if (d.includes('SPLIT RAIL') || d.includes('P&R') || c.startsWith('PSR')) return 'P&R Rail';
+    // Pergola
+    if (d.includes('PERGOLA') || c.startsWith('WPER')) return 'Pergola';
+    // Arbor
+    if (d.includes('ARBOR') || c.startsWith('WARC')) return 'Arbor';
+    // Halo
+    if (d.includes('HALO') || c.startsWith('WHAL')) return 'Halo';
+    // Topper
+    if (d.includes('TOPPER') || c.startsWith('WT')) return 'Topper';
+    // Lattice (after topper check since some toppers are lattice)
+    if (d.includes('LATTICE') && !d.includes('TOPPER')) return 'Lattice';
+    // Picket
+    if (d.includes('PICKET') && !d.includes('SECTION') && !d.includes('PANEL')) return 'Picket';
+    // Round post
+    if (d.includes('ROUND POST')) return 'round post';
+    // Rail (standalone rails, not part of section)
+    if (d.includes('RAIL') && !d.includes('SECTION') && !d.includes('PANEL') && !d.includes('GATE')) return 'Rail';
+    // Default: Fence Sections
+    return 'Fence Sections';
+  }
+
+  // ── CSV Parser ────────────────────────────────────────────────
+  function parseCSV(text) {
+    const lines = text.split('\n').map(l => l.trim()).filter(Boolean);
+    // Find the header row (contains "Item Code")
+    let headerIdx = lines.findIndex(l => l.toLowerCase().includes('item code'));
+    if (headerIdx === -1) headerIdx = 0;
+    const headers = lines[headerIdx].split(',').map(h => h.trim().replace(/^"|"$/g, ''));
+
+    const codeCol = headers.findIndex(h => h.toLowerCase().includes('item code') || h.toLowerCase() === 'item code');
+    const descCol = headers.findIndex(h => h.toLowerCase().includes('description'));
+    const prodCol = headers.findIndex(h => h.toLowerCase().includes('prod'));
+
+    const rows = [];
+    for (let i = headerIdx + 1; i < lines.length; i++) {
+      // Handle quoted fields
+      const cols = splitCSVLine(lines[i]);
+      const code = (cols[codeCol] || '').trim().replace(/^"|"$/g, '');
+      const desc = (cols[descCol] || '').trim().replace(/^"|"$/g, '').replace(/^\*/, '');
+      const prodRaw = (cols[prodCol] || '').trim().replace(/^"|"$/g, '');
+      // Strip leading zero from prod number
+      const prod = prodRaw.replace(/^0+/, '') || prodRaw;
+      if (code) rows.push({ code, desc, prod });
+    }
+    return rows;
+  }
+
+  function splitCSVLine(line) {
+    const result = [];
+    let current = '';
+    let inQuotes = false;
+    for (let i = 0; i < line.length; i++) {
+      if (line[i] === '"') { inQuotes = !inQuotes; }
+      else if (line[i] === ',' && !inQuotes) { result.push(current); current = ''; }
+      else { current += line[i]; }
+    }
+    result.push(current);
+    return result;
+  }
+
+  // ── File handler ──────────────────────────────────────────────
+  function handleFile(event) {
+    const file = event.target.files[0];
+    if (file) processCSV(file);
+  }
+
+  function processCSV(file) {
+    const reader = new FileReader();
+    reader.onload = async (e) => {
+      document.getElementById('file-info').textContent = `📄 ${file.name} loaded — fetching your Notion database...`;
+      document.getElementById('file-info').classList.remove('hidden');
+
+      csvRows = parseCSV(e.target.result);
+
+      // Fetch all existing codes from Notion
+      try {
+        existingCodes = await fetchAllNotionCodes();
+      } catch (err) {
+        alert('Could not connect to Notion. Check your token and try again.\n\nError: ' + err.message);
+        return;
+      }
+
+      // Compare
+      comparedRows = csvRows.map(row => ({
+        ...row,
+        category: detectCategory(row.code, row.desc),
+        status: existingCodes.has(row.code.toUpperCase()) ? 'exists' : 'new'
+      }));
+
+      renderResults();
+      setStep(3);
+    };
+    reader.readAsText(file);
+  }
+
+  // ── Notion: fetch all existing fence codes ────────────────────
+  async function fetchAllNotionCodes() {
+    const codes = new Set();
+    let cursor = null;
+    let hasMore = true;
+
+    while (hasMore) {
+      const bodyObj = { page_size: 100 };
+      if (cursor) bodyObj.start_cursor = cursor;
+
+      const res = await fetch(`https://api.notion.com/v1/databases/${dbId}/query`, {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${notionToken}`,
+          'Notion-Version': '2022-06-28',
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(bodyObj)
+      });
+
+      if (!res.ok) {
+        const err = await res.json();
+        throw new Error(err.message || 'Notion API error');
+      }
+
+      const data = await res.json();
+      for (const page of (data.results || [])) {
+        const code = page.properties['Fence Code']?.title?.[0]?.plain_text || '';
+        if (code) codes.add(code.trim().toUpperCase());
+      }
+      hasMore = data.has_more;
+      cursor = data.next_cursor;
+    }
+    return codes;
+  }
+
+  // ── Render results table ──────────────────────────────────────
+  function renderResults() {
+    const newCount = comparedRows.filter(r => r.status === 'new').length;
+    const existsCount = comparedRows.filter(r => r.status === 'exists').length;
+
+    document.getElementById('count-new').textContent = newCount;
+    document.getElementById('count-exists').textContent = existsCount;
+    document.getElementById('count-missing').textContent = 0;
+    document.getElementById('import-count').textContent = newCount;
+
+    if (newCount === 0) {
+      document.getElementById('import-btn').disabled = true;
+      document.getElementById('import-btn').textContent = '✅ Nothing new to add';
+    }
+
+    filterTable('new');
+  }
+
+  function filterTable(mode) {
+    const tbody = document.getElementById('results-table');
+    tbody.innerHTML = '';
+
+    const rows = mode === 'new'
+      ? comparedRows.filter(r => r.status === 'new')
+      : comparedRows;
+
+    rows.forEach(row => {
+      const tr = document.createElement('tr');
+      const statusClass = row.status === 'new' ? 'td-status-new' : 'td-status-exists';
+      const statusLabel = row.status === 'new' ? '✅ New' : '⏭️ Already exists';
+      tr.innerHTML = `
+        <td class="td-code">${row.code}</td>
+        <td>${row.desc || '—'}</td>
+        <td>${row.prod || '—'}</td>
+        <td class="td-cat">${row.category}</td>
+        <td class="${statusClass}">${statusLabel}</td>
+      `;
+      tbody.appendChild(tr);
+    });
+
+    document.getElementById('filter-all').style.borderColor = mode === 'all' ? 'var(--green)' : '';
+    document.getElementById('filter-new').style.borderColor = mode === 'new' ? 'var(--green)' : '';
+  }
+
+  // ── Import to Notion ──────────────────────────────────────────
+  async function startImport() {
+    const newRows = comparedRows.filter(r => r.status === 'new');
+    if (newRows.length === 0) return;
+
+    setStep(4);
+
+    const log = document.getElementById('log');
+    const bar = document.getElementById('progress-bar');
+    const progressText = document.getElementById('progress-text');
+
+    let done = 0;
+    let errors = 0;
+
+    for (const row of newRows) {
+      try {
+        await addToNotion(row);
+        log.innerHTML += `<div class="log-ok">✅ Added: ${row.code} — ${row.desc}</div>`;
+      } catch (err) {
+        log.innerHTML += `<div class="log-err">❌ Failed: ${row.code} — ${err.message}</div>`;
+        errors++;
+      }
+      done++;
+      const pct = Math.round((done / newRows.length) * 100);
+      bar.style.width = pct + '%';
+      progressText.textContent = `${done} of ${newRows.length} processed${errors > 0 ? ` (${errors} errors)` : ''}`;
+      log.scrollTop = log.scrollHeight;
+
+      // Small delay to avoid hitting Notion rate limits
+      await sleep(300);
+    }
+
+    progressText.textContent = `✅ Done! ${done - errors} added, ${errors} errors.`;
+    document.getElementById('done-msg').classList.remove('hidden');
+  }
+
+  async function addToNotion(row) {
+    const properties = {
+      'Fence Code': { title: [{ text: { content: row.code } }] },
+    };
+    if (row.desc) {
+      properties['Description'] = { rich_text: [{ text: { content: row.desc } }] };
+    }
+    if (row.prod) {
+      properties['Prod'] = { select: { name: row.prod } };
+    }
+    if (row.category) {
+      properties['Category'] = { select: { name: row.category } };
+    }
+
+    const res = await fetch('https://api.notion.com/v1/pages', {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${notionToken}`,
+        'Notion-Version': '2022-06-28',
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({
+        parent: { database_id: dbId },
+        properties
+      })
+    });
+
+    if (!res.ok) {
+      const err = await res.json();
+      throw new Error(err.message || 'Notion write error');
+    }
+  }
+
+  function sleep(ms) { return new Promise(r => setTimeout(r, ms)); }
+
+  function resetTool() {
+    csvRows = [];
+    comparedRows = [];
+    existingCodes = new Set();
+    document.getElementById('file-info').classList.add('hidden');
+    document.getElementById('file-input').value = '';
+    document.getElementById('results-table').innerHTML = '';
+    document.getElementById('log').innerHTML = '';
+    document.getElementById('progress-bar').style.width = '0%';
+    document.getElementById('import-btn').disabled = false;
+    document.getElementById('done-msg').classList.add('hidden');
+    setStep(2);
+  }
+</script>
+</body>
+</html>
