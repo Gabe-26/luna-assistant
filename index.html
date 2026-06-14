@@ -22,9 +22,9 @@
       --user-bubble: #3d4a35;
       --accent: #c4a55a;
     }
- 
+
     * { box-sizing: border-box; margin: 0; padding: 0; }
- 
+
     body {
       font-family: 'DM Sans', sans-serif;
       background: var(--bg);
@@ -34,7 +34,7 @@
       flex-direction: column;
       overflow: hidden;
     }
- 
+
     /* ─── INVITE / LOGIN SCREEN ─────────────────────────────────── */
     #invite-screen {
       position: fixed;
@@ -48,7 +48,7 @@
       gap: 0;
       padding: 24px;
     }
- 
+
     .invite-card {
       background: var(--card);
       border: 1px solid var(--border);
@@ -61,13 +61,13 @@
       gap: 28px;
       box-shadow: 0 32px 80px rgba(0,0,0,0.5);
     }
- 
+
     .invite-logo {
       display: flex;
       align-items: center;
       gap: 12px;
     }
- 
+
     .invite-logo-icon {
       width: 44px;
       height: 44px;
@@ -78,31 +78,31 @@
       justify-content: center;
       font-size: 20px;
     }
- 
+
     .invite-logo-text h1 {
       font-family: 'Playfair Display', serif;
       font-size: 22px;
       color: var(--text);
       font-weight: 700;
     }
- 
+
     .invite-logo-text p {
       font-size: 12px;
       color: var(--text-muted);
       margin-top: 2px;
     }
- 
+
     .invite-divider {
       height: 1px;
       background: var(--border);
     }
- 
+
     .invite-step {
       display: flex;
       flex-direction: column;
       gap: 10px;
     }
- 
+
     .invite-step label {
       font-size: 13px;
       font-weight: 500;
@@ -110,7 +110,7 @@
       letter-spacing: 0.05em;
       text-transform: uppercase;
     }
- 
+
     .invite-step input {
       background: var(--bg2);
       border: 1.5px solid var(--border);
@@ -123,28 +123,28 @@
       transition: border-color 0.2s;
       width: 100%;
     }
- 
+
     .invite-step input:focus {
       border-color: var(--green);
     }
- 
+
     .invite-step input.error {
       border-color: #c45a5a;
     }
- 
+
     .invite-error {
       font-size: 13px;
       color: #c47a7a;
       display: none;
     }
- 
+
     .invite-error.show {
       display: block;
     }
- 
+
     /* Name step hidden by default */
     #name-step { display: none; }
- 
+
     .invite-btn {
       background: var(--green);
       color: #fff;
@@ -158,21 +158,21 @@
       transition: background 0.2s, transform 0.1s;
       width: 100%;
     }
- 
+
     .invite-btn:hover { background: var(--green-light); }
     .invite-btn:active { transform: scale(0.98); }
- 
+
     .invite-footer {
       font-size: 12px;
       color: var(--text-dim);
       text-align: center;
       line-height: 1.6;
     }
- 
+
     /* ─── MAIN APP ──────────────────────────────────────────────── */
     #app { display: none; flex-direction: column; height: 100dvh; }
     #app.visible { display: flex; }
- 
+
     /* Header */
     .header {
       display: flex;
@@ -183,13 +183,13 @@
       border-bottom: 1px solid var(--border);
       flex-shrink: 0;
     }
- 
+
     .header-left {
       display: flex;
       align-items: center;
       gap: 12px;
     }
- 
+
     .header-icon {
       width: 36px;
       height: 36px;
@@ -201,26 +201,26 @@
       font-size: 16px;
       flex-shrink: 0;
     }
- 
+
     .header-title {
       font-family: 'Playfair Display', serif;
       font-size: 16px;
       font-weight: 700;
       color: var(--text);
     }
- 
+
     .header-sub {
       font-size: 11px;
       color: var(--green-light);
       margin-top: 1px;
     }
- 
+
     .header-right {
       display: flex;
       align-items: center;
       gap: 10px;
     }
- 
+
     .user-badge {
       background: var(--bg3);
       border: 1px solid var(--border);
@@ -232,14 +232,14 @@
       align-items: center;
       gap: 6px;
     }
- 
+
     .user-dot {
       width: 6px;
       height: 6px;
       border-radius: 50%;
       background: var(--green);
     }
- 
+
     .clear-btn {
       background: transparent;
       border: 1px solid var(--border);
@@ -251,12 +251,12 @@
       cursor: pointer;
       transition: all 0.2s;
     }
- 
+
     .clear-btn:hover {
       border-color: var(--text-muted);
       color: var(--text);
     }
- 
+
     /* Chat */
     #chat {
       flex: 1;
@@ -267,11 +267,11 @@
       gap: 16px;
       scroll-behavior: smooth;
     }
- 
+
     #chat::-webkit-scrollbar { width: 4px; }
     #chat::-webkit-scrollbar-track { background: transparent; }
     #chat::-webkit-scrollbar-thumb { background: var(--border); border-radius: 2px; }
- 
+
     /* Welcome card */
     .welcome-card {
       background: var(--card);
@@ -280,7 +280,7 @@
       padding: 24px;
       max-width: 420px;
     }
- 
+
     .welcome-card h2 {
       font-family: 'Playfair Display', serif;
       font-size: 20px;
@@ -288,13 +288,13 @@
       margin-bottom: 10px;
       color: var(--text);
     }
- 
+
     .welcome-card p {
       font-size: 14px;
       color: var(--text-muted);
       line-height: 1.6;
     }
- 
+
     /* Message bubbles */
     .msg {
       display: flex;
@@ -302,14 +302,14 @@
       max-width: 82%;
       animation: fadeUp 0.25s ease;
     }
- 
+
     @keyframes fadeUp {
       from { opacity: 0; transform: translateY(8px); }
       to { opacity: 1; transform: translateY(0); }
     }
- 
+
     .msg.user { align-self: flex-end; flex-direction: row-reverse; }
- 
+
     .avatar {
       width: 30px;
       height: 30px;
@@ -322,10 +322,10 @@
       flex-shrink: 0;
       margin-top: 2px;
     }
- 
+
     .avatar.luna { background: var(--green); color: #fff; }
     .avatar.user { background: var(--bg3); color: var(--text-muted); border: 1px solid var(--border); }
- 
+
     .bubble {
       padding: 12px 16px;
       border-radius: 14px;
@@ -333,19 +333,19 @@
       line-height: 1.65;
       color: var(--text);
     }
- 
+
     .bubble.luna {
       background: var(--luna-bubble);
       border: 1px solid var(--border);
       border-top-left-radius: 4px;
     }
- 
+
     .bubble.user {
       background: var(--user-bubble);
       border: 1px solid rgba(107,143,94,0.3);
       border-top-right-radius: 4px;
     }
- 
+
     .bubble strong { color: var(--accent); }
     .bubble a { color: var(--green-light); text-decoration: none; border-bottom: 1px solid rgba(138,173,123,0.3); }
     .bubble a:hover { border-bottom-color: var(--green-light); }
@@ -354,7 +354,7 @@
     .bubble h1, .bubble h2, .bubble h3 { font-family: 'Playfair Display', serif; margin: 8px 0 4px; color: var(--text); }
     .bubble code { background: var(--bg); padding: 2px 6px; border-radius: 4px; font-size: 12px; }
     .bubble p { margin: 4px 0; }
- 
+
     /* Typing indicator */
     .typing { display: flex; gap: 5px; align-items: center; padding: 14px 16px; }
     .typing span {
@@ -367,7 +367,7 @@
       0%, 60%, 100% { transform: translateY(0); opacity: 0.4; }
       30% { transform: translateY(-5px); opacity: 1; }
     }
- 
+
     /* Input */
     .input-area {
       padding: 14px 16px;
@@ -378,7 +378,7 @@
       align-items: flex-end;
       flex-shrink: 0;
     }
- 
+
     #input {
       flex: 1;
       background: var(--bg3);
@@ -396,10 +396,10 @@
       transition: border-color 0.2s;
       line-height: 1.5;
     }
- 
+
     #input:focus { border-color: var(--green); }
     #input::placeholder { color: var(--text-dim); }
- 
+
     #send-btn {
       width: 46px;
       height: 46px;
@@ -413,11 +413,11 @@
       flex-shrink: 0;
       transition: background 0.2s, transform 0.1s;
     }
- 
+
     #send-btn:hover { background: var(--green-light); }
     #send-btn:active { transform: scale(0.95); }
     #send-btn svg { width: 18px; height: 18px; fill: #fff; }
- 
+
     .input-hint {
       font-size: 11px;
       color: var(--text-dim);
@@ -425,7 +425,7 @@
       padding: 0 16px 10px;
       flex-shrink: 0;
     }
- 
+
     /* Conversation mode button */
     #convo-btn {
       width: 100%;
@@ -456,7 +456,7 @@
       0%, 100% { box-shadow: 0 0 0 0 rgba(196,90,90,0.3); }
       50% { box-shadow: 0 0 0 8px rgba(196,90,90,0); }
     }
- 
+
     /* Speaking indicator in header */
     #speaking-indicator {
       display: none;
@@ -497,7 +497,7 @@
       0%, 100% { box-shadow: 0 0 0 0 rgba(196,90,90,0.4); }
       50% { box-shadow: 0 0 0 6px rgba(196,90,90,0); }
     }
- 
+
     /* Voice toggle in header */
     #voice-toggle {
       background: transparent;
@@ -515,7 +515,81 @@
     }
     #voice-toggle:hover { border-color: var(--green); color: var(--text); }
     #voice-toggle.active { border-color: var(--green); color: var(--green-light); }
- 
+
+    /* Mode toggle in header */
+    #mode-toggle {
+      background: transparent;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      color: var(--text-muted);
+      font-family: 'DM Sans', sans-serif;
+      font-size: 12px;
+      padding: 5px 10px;
+      cursor: pointer;
+      transition: all 0.2s;
+      display: flex;
+      align-items: center;
+      gap: 5px;
+    }
+    #mode-toggle:hover { border-color: var(--accent); color: var(--text); }
+    #mode-toggle.quote-active {
+      border-color: var(--accent);
+      color: var(--accent);
+      background: rgba(196,165,90,0.12);
+    }
+
+    /* Image preview chip above input */
+    #image-preview-wrap {
+      display: none;
+      padding: 8px 16px 0;
+      flex-shrink: 0;
+    }
+    #image-preview-wrap.show { display: flex; }
+    .image-chip {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      background: var(--bg3);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 6px 10px;
+      font-size: 12px;
+      color: var(--text-muted);
+    }
+    .image-chip img {
+      width: 32px;
+      height: 32px;
+      object-fit: cover;
+      border-radius: 6px;
+    }
+    .image-chip button {
+      background: transparent;
+      border: none;
+      color: var(--text-dim);
+      cursor: pointer;
+      font-size: 14px;
+      padding: 0 2px;
+    }
+    .image-chip button:hover { color: #c47a7a; }
+
+    /* Photo upload button */
+    #photo-btn {
+      width: 46px;
+      height: 46px;
+      background: var(--bg3);
+      border: 1.5px solid var(--border);
+      border-radius: 12px;
+      cursor: pointer;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+      font-size: 18px;
+      transition: all 0.2s;
+    }
+    #photo-btn.show { display: flex; }
+    #photo-btn:hover { border-color: var(--accent); }
+
     /* Browser not supported toast */
     #voice-unsupported {
       display: none;
@@ -532,7 +606,7 @@
       z-index: 99;
       white-space: nowrap;
     }
- 
+
     /* Secret log */
     #log-overlay {
       display: none;
@@ -577,7 +651,7 @@
   </style>
 </head>
 <body>
- 
+
 <!-- ─── INVITE SCREEN ─────────────────────────────────────────── -->
 <div id="invite-screen">
   <div class="invite-card">
@@ -588,31 +662,31 @@
         <p>Wood Department Assistant</p>
       </div>
     </div>
- 
+
     <div class="invite-divider"></div>
- 
+
     <!-- Step 1: Invite code -->
     <div class="invite-step" id="code-step">
       <label>Enter your invite code</label>
       <input type="text" id="code-input" placeholder="e.g. WOOD-A1B2" autocomplete="off" spellcheck="false" />
       <div class="invite-error" id="code-error">That code isn't valid. Check with your supervisor.</div>
     </div>
- 
+
     <!-- Step 2: Name (shown after valid code) -->
     <div class="invite-step" id="name-step">
       <label>What's your name?</label>
       <input type="text" id="name-input" placeholder="e.g. Carlos" autocomplete="off" />
       <div class="invite-error" id="name-error">Please enter your name to continue.</div>
     </div>
- 
+
     <button class="invite-btn" id="invite-btn" onclick="handleInviteStep()">Continue</button>
- 
+
     <div class="invite-footer">
       🔒 Access is by invitation only.<br>Contact your supervisor if you need a code.
     </div>
   </div>
 </div>
- 
+
 <!-- ─── MAIN APP ──────────────────────────────────────────────── -->
 <div id="app">
   <div class="header">
@@ -628,35 +702,45 @@
         <div class="user-dot"></div>
         <span id="user-name-display">—</span>
       </div>
+      <button id="mode-toggle" onclick="toggleMode()" title="Switch between Shop and Quote mode">🪵 Shop Mode</button>
       <button id="voice-toggle" onclick="toggleVoice()" title="Toggle Luna's voice">🔇 Voice</button>
       <div id="speaking-indicator"><div class="speak-dot"></div><div class="speak-dot"></div><div class="speak-dot"></div> Luna is speaking</div>
       <button class="clear-btn" onclick="clearChat()">Clear chat</button>
     </div>
   </div>
- 
+
   <div id="chat">
     <div class="welcome-card">
       <h2>Hey, I'm Luna 👋</h2>
       <p>I'm your wood department assistant. Ask me about wood species, panel assembly, item codes, post installation, defects, fasteners — anything on the shop floor. I've got the full product catalog loaded and I'm ready to help.</p>
     </div>
   </div>
- 
+
   <div style="padding: 0 16px 10px; flex-shrink: 0;">
     <button id="convo-btn" onclick="toggleConversation()">🎙️ Talk to Luna</button>
   </div>
+  <div id="image-preview-wrap">
+    <div class="image-chip">
+      <img id="image-preview-thumb" src="" alt="preview" />
+      <span>Photo attached</span>
+      <button onclick="clearPendingImage()" title="Remove photo">✕</button>
+    </div>
+  </div>
   <div class="input-area">
     <textarea id="input" placeholder="Ask Luna about wood types, assembly, item codes, defects..." rows="1"></textarea>
+    <input type="file" id="photo-input" accept="image/*" style="display:none" onchange="handlePhotoSelect(event)" />
+    <button id="photo-btn" onclick="document.getElementById('photo-input').click()" title="Attach a reference photo">📷</button>
     <button id="mic-btn" onclick="toggleMic()" title="Hold to speak">🎤</button>
     <button id="send-btn" onclick="sendMessage()">
       <svg viewBox="0 0 24 24"><path d="M2 21l21-9L2 3v7l15 2-15 2v7z"/></svg>
     </button>
   </div>
-  <div class="input-hint">Press Enter to send · Shift+Enter for new line · 🎤 to speak</div>
+  <div class="input-hint" id="input-hint">Press Enter to send · Shift+Enter for new line · 🎤 to speak</div>
 </div>
- 
+
 <!-- Browser not supported toast -->
 <div id="voice-unsupported">🚫 Voice not supported — try Chrome or Edge</div>
- 
+
 <!-- Secret log -->
 <div id="log-overlay">
   <div class="log-box">
@@ -665,7 +749,7 @@
     <button class="log-close" onclick="document.getElementById('log-overlay').classList.remove('show')">Close</button>
   </div>
 </div>
- 
+
 <script>
   // ─── VALID INVITE CODES ───────────────────────────────────────
   // Add/remove codes here to control access
@@ -675,27 +759,29 @@
     'LUNA-SHOP': 'Shop Floor',
     'LUNA-MGMT': 'Management',
   };
- 
+
   const WORKER_URL = 'https://luna-proxy.gabrieltoribio6.workers.dev/';
- 
+
   let currentUser = '';
   let messages = [];
   let unknownLog = JSON.parse(localStorage.getItem('luna_unknown') || '[]');
   let inviteStep = 1;
- 
+  let currentMode = 'shop'; // 'shop' or 'quote'
+  let pendingImage = null; // { data: base64, mediaType: '...' }
+
   // ─── INVITE LOGIC ─────────────────────────────────────────────
   function handleInviteStep() {
     if (inviteStep === 1) {
       const code = document.getElementById('code-input').value.trim().toUpperCase();
       const codeError = document.getElementById('code-error');
       const codeInput = document.getElementById('code-input');
- 
+
       if (!VALID_CODES[code]) {
         codeInput.classList.add('error');
         codeError.classList.add('show');
         return;
       }
- 
+
       // Valid code — show name step
       codeInput.classList.remove('error');
       codeError.classList.remove('show');
@@ -705,18 +791,18 @@
       document.getElementById('invite-btn').textContent = 'Enter Luna →';
       inviteStep = 2;
       document.getElementById('name-input').focus();
- 
+
     } else if (inviteStep === 2) {
       const name = document.getElementById('name-input').value.trim();
       const nameError = document.getElementById('name-error');
       const nameInput = document.getElementById('name-input');
- 
+
       if (!name || name.length < 2) {
         nameInput.classList.add('error');
         nameError.classList.add('show');
         return;
       }
- 
+
       // Save and enter
       currentUser = name;
       localStorage.setItem('luna_user', name);
@@ -724,7 +810,7 @@
       enterApp();
     }
   }
- 
+
   function enterApp() {
     document.getElementById('invite-screen').style.display = 'none';
     const app = document.getElementById('app');
@@ -732,7 +818,7 @@
     document.getElementById('user-name-display').textContent = currentUser;
     document.getElementById('input').focus();
   }
- 
+
   // Check if already logged in
   window.addEventListener('load', () => {
     // Check URL for invite code
@@ -741,7 +827,7 @@
     if (urlCode && VALID_CODES[urlCode.toUpperCase()]) {
       document.getElementById('code-input').value = urlCode.toUpperCase();
     }
- 
+
     // Check if returning user
     const savedUser = localStorage.getItem('luna_user');
     const savedCode = localStorage.getItem('luna_code');
@@ -750,10 +836,10 @@
       enterApp();
       return;
     }
- 
+
     document.getElementById('code-input').focus();
   });
- 
+
   // Enter key on inputs
   document.addEventListener('keydown', (e) => {
     if (e.key === 'Enter' && document.getElementById('invite-screen').style.display !== 'none') {
@@ -761,27 +847,27 @@
       handleInviteStep();
     }
   });
- 
+
   // ─── CHAT LOGIC ───────────────────────────────────────────────
   const chatEl = document.getElementById('chat');
   const inputEl = document.getElementById('input');
- 
+
   inputEl.addEventListener('keydown', (e) => {
     if (e.key === 'Enter' && !e.shiftKey) {
       e.preventDefault();
       sendMessage();
     }
   });
- 
+
   inputEl.addEventListener('input', () => {
     inputEl.style.height = 'auto';
     inputEl.style.height = Math.min(inputEl.scrollHeight, 140) + 'px';
   });
- 
+
   function addMessage(role, content) {
     const msg = document.createElement('div');
     msg.className = `msg ${role}`;
- 
+
     const initial = role === 'luna' ? 'L' : currentUser.charAt(0).toUpperCase();
     msg.innerHTML = `
       <div class="avatar ${role}">${initial}</div>
@@ -791,7 +877,7 @@
     chatEl.scrollTop = chatEl.scrollHeight;
     return msg;
   }
- 
+
   function showTyping() {
     const msg = document.createElement('div');
     msg.className = 'msg luna';
@@ -805,12 +891,12 @@
     chatEl.appendChild(msg);
     chatEl.scrollTop = chatEl.scrollHeight;
   }
- 
+
   function removeTyping() {
     const t = document.getElementById('typing');
     if (t) t.remove();
   }
- 
+
   function formatMarkdown(text) {
     return text
       .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
@@ -825,92 +911,177 @@
       .replace(/\n{2,}/g, '</p><p>')
       .replace(/\n/g, '<br>');
   }
- 
+
   async function sendMessage() {
     const text = inputEl.value.trim();
-    if (!text) return;
- 
+    if (!text && !pendingImage) return;
+
     inputEl.value = '';
     inputEl.style.height = 'auto';
- 
+
     // Add to UI and history
-    addMessage('user', text);
-    messages.push({ role: 'user', content: text });
- 
+    const displayText = text || '(photo attached)';
+    addMessage('user', displayText);
+    messages.push({ role: 'user', content: text || 'Here is a reference photo of the requested gate/fence. Find the closest past quote match.' });
+
     showTyping();
     document.getElementById('send-btn').disabled = true;
     if (conversationMode) stopMic();
- 
+
+    const requestBody = {
+      messages,
+      _user: currentUser,  // Send user name to worker for logging
+      _mode: currentMode
+    };
+    if (currentMode === 'quote' && pendingImage) {
+      requestBody._image = pendingImage;
+    }
+    const imageWasSent = !!(currentMode === 'quote' && pendingImage);
+    clearPendingImage();
+
     try {
       const res = await fetch(WORKER_URL, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          messages,
-          _user: currentUser  // Send user name to worker for logging
-        })
+        body: JSON.stringify(requestBody)
       });
- 
+
       const data = await res.json();
       removeTyping();
- 
+
       const reply = data.content?.[0]?.text || 'Sorry, I had trouble responding. Try again.';
- 
-      // Check for unknown question flag
-      if (reply.includes('UNKNOWN_QUESTION:')) {
-        const match = reply.match(/UNKNOWN_QUESTION:\s*(.+)/);
-        if (match) {
-          const q = match[1].trim();
-          unknownLog.push({ q, user: currentUser, time: new Date().toLocaleString() });
-          localStorage.setItem('luna_unknown', JSON.stringify(unknownLog));
-          // Also log to Notion with user name
-          fetch(WORKER_URL, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ _logUnknown: q, _user: currentUser })
-          }).catch(() => {});
+
+      if (currentMode === 'quote') {
+        // Quote mode: no unknown-question logging, no TTS
+        addMessage('luna', reply.trim());
+        messages.push({ role: 'assistant', content: reply.trim() });
+      } else {
+        // Check for unknown question flag
+        if (reply.includes('UNKNOWN_QUESTION:')) {
+          const match = reply.match(/UNKNOWN_QUESTION:\s*(.+)/);
+          if (match) {
+            const q = match[1].trim();
+            unknownLog.push({ q, user: currentUser, time: new Date().toLocaleString() });
+            localStorage.setItem('luna_unknown', JSON.stringify(unknownLog));
+            // Also log to Notion with user name
+            fetch(WORKER_URL, {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({ _logUnknown: q, _user: currentUser })
+            }).catch(() => {});
+          }
         }
+
+        const cleanReply = reply.replace(/UNKNOWN_QUESTION:.*/g, '').trim();
+        addMessage('luna', cleanReply);
+        messages.push({ role: 'assistant', content: cleanReply });
+        lunaSpeak(cleanReply);
       }
- 
-      const cleanReply = reply.replace(/UNKNOWN_QUESTION:.*/g, '').trim();
-      addMessage('luna', cleanReply);
-      messages.push({ role: 'assistant', content: cleanReply });
-      lunaSpeak(cleanReply);
- 
+
     } catch (err) {
       removeTyping();
       addMessage('luna', 'I had trouble connecting. Please try again.');
     }
- 
+
     document.getElementById('send-btn').disabled = false;
     inputEl.focus();
   }
- 
+
   function clearChat() {
     messages = [];
-    chatEl.innerHTML = `
+    chatEl.innerHTML = welcomeCardHTML();
+  }
+
+  function welcomeCardHTML() {
+    if (currentMode === 'quote') {
+      return `
+      <div class="welcome-card">
+        <h2>Quote Mode 📋</h2>
+        <p>Describe the gate or fence section a customer wants — dimensions, style, any details — and attach a reference photo if you have one (📷). I'll check our past quotes for the closest match so you have a price and PO# to start from.</p>
+      </div>`;
+    }
+    return `
       <div class="welcome-card">
         <h2>Hey, I'm Luna 👋</h2>
         <p>I'm your wood department assistant. Ask me about wood species, panel assembly, item codes, post installation, defects, fasteners — anything on the shop floor. I've got the full product catalog loaded and I'm ready to help.</p>
       </div>`;
   }
- 
+
+  // ─── MODE TOGGLE ────────────────────────────────────────────────
+  function toggleMode() {
+    currentMode = currentMode === 'shop' ? 'quote' : 'shop';
+    messages = []; // start fresh context when switching modes
+    clearPendingImage();
+
+    const btn = document.getElementById('mode-toggle');
+    const photoBtn = document.getElementById('photo-btn');
+    const hint = document.getElementById('input-hint');
+
+    if (currentMode === 'quote') {
+      btn.textContent = '📋 Quote Mode';
+      btn.classList.add('quote-active');
+      photoBtn.classList.add('show');
+      inputEl.placeholder = 'Describe the gate/fence request (size, style, customer)...';
+      hint.textContent = 'Press Enter to send · 📷 to attach a reference photo';
+    } else {
+      btn.textContent = '🪵 Shop Mode';
+      btn.classList.remove('quote-active');
+      photoBtn.classList.remove('show');
+      inputEl.placeholder = 'Ask Luna about wood types, assembly, item codes, defects...';
+      hint.textContent = 'Press Enter to send · Shift+Enter for new line · 🎤 to speak';
+    }
+
+    chatEl.innerHTML = welcomeCardHTML();
+  }
+
+  // ─── PHOTO ATTACHMENT (Quote Mode) ──────────────────────────────
+  function handlePhotoSelect(event) {
+    const file = event.target.files[0];
+    if (!file) return;
+    if (!file.type.startsWith('image/')) {
+      alert('Please select an image file.');
+      return;
+    }
+
+    const reader = new FileReader();
+    reader.onload = (e) => {
+      const dataUrl = e.target.result; // "data:image/jpeg;base64,...."
+      const [meta, base64] = dataUrl.split(',');
+      const mediaType = meta.match(/data:(.*?);base64/)?.[1] || file.type;
+
+      pendingImage = { data: base64, mediaType };
+
+      document.getElementById('image-preview-thumb').src = dataUrl;
+      document.getElementById('image-preview-wrap').classList.add('show');
+    };
+    reader.readAsDataURL(file);
+
+    // Reset the input so the same file can be re-selected later if needed
+    event.target.value = '';
+  }
+
+  function clearPendingImage() {
+    pendingImage = null;
+    document.getElementById('image-preview-wrap').classList.remove('show');
+    document.getElementById('image-preview-thumb').src = '';
+  }
+
   // ─── VOICE LOGIC ─────────────────────────────────────────────
- 
+
   // Check browser support
   const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
   const hasMic = !!SpeechRecognition;
- 
+
   // Disable mic button if not supported
   if (!hasMic) {
     document.getElementById('mic-btn').style.opacity = '0.4';
     document.getElementById('mic-btn').style.cursor = 'not-allowed';
   }
- 
+
   // Voice on/off toggle (Luna speaking) — saved to localStorage
   let voiceOn = localStorage.getItem('luna_voice') === 'true';
   updateVoiceToggle();
- 
+
   function updateVoiceToggle() {
     const btn = document.getElementById('voice-toggle');
     if (voiceOn) {
@@ -921,13 +1092,13 @@
       btn.classList.remove('active');
     }
   }
- 
+
   function toggleVoice() {
     voiceOn = !voiceOn;
     localStorage.setItem('luna_voice', voiceOn);
     updateVoiceToggle();
   }
- 
+
   // Strip markdown so Luna doesn't read asterisks aloud
   function stripMarkdown(text) {
     return text
@@ -941,17 +1112,17 @@
       .replace(/\n+/g, ' ')
       .trim();
   }
- 
+
   function lunaSpeak(text) {
     if (!voiceOn && !conversationMode) return;
     const clean = stripMarkdown(text);
     if (!clean) return;
- 
+
     const VOICE_ID = 'X2xQDOse6fMfO3ues8Lu'; // Custom Luna voice
     const EL_KEY = 'sk_a4ba9bde7376ff9d7d35d3261738a864f252120003a6a54d';
- 
+
     document.getElementById('speaking-indicator').classList.add('show');
- 
+
     fetch(`https://api.elevenlabs.io/v1/text-to-speech/${VOICE_ID}`, {
       method: 'POST',
       headers: {
@@ -987,12 +1158,12 @@
       if (conversationMode) setTimeout(() => startMic(), 400);
     });
   }
- 
+
   // Mic / speech-to-text
   let recognition = null;
   let isRecording = false;
   let conversationMode = false;
- 
+
   // ─── CONVERSATION MODE ────────────────────────────────────────
   function toggleConversation() {
     if (!hasMic) {
@@ -1005,7 +1176,7 @@
       startConversation();
     }
   }
- 
+
   function startConversation() {
     conversationMode = true;
     voiceOn = true;
@@ -1016,7 +1187,7 @@
     btn.textContent = '⏹️ End Conversation';
     startMic();
   }
- 
+
   function stopConversation() {
     conversationMode = false;
     stopMic();
@@ -1025,7 +1196,7 @@
     btn.textContent = '🎙️ Talk to Luna';
     document.getElementById('speaking-indicator').classList.remove('show');
   }
- 
+
   function toggleMic() {
     if (!hasMic) {
       showUnsupported();
@@ -1037,17 +1208,17 @@
       startMic();
     }
   }
- 
+
   function startMic() {
     recognition = new SpeechRecognition();
     recognition.lang = 'en-US';
     recognition.interimResults = true;
     recognition.continuous = true;
     recognition.maxAlternatives = 1;
- 
+
     let finalTranscript = '';
     let silenceTimer = null;
- 
+
     recognition.onstart = () => {
       isRecording = true;
       finalTranscript = '';
@@ -1055,7 +1226,7 @@
       document.getElementById('mic-btn').textContent = '⏹️';
       document.getElementById('input').placeholder = 'Listening...';
     };
- 
+
     recognition.onresult = (event) => {
       let interim = '';
       finalTranscript = '';
@@ -1068,7 +1239,7 @@
       }
       // Show live preview in input
       document.getElementById('input').value = finalTranscript || interim;
- 
+
       // Reset silence timer — send after 1.5s of no new speech
       clearTimeout(silenceTimer);
       if (finalTranscript) {
@@ -1078,7 +1249,7 @@
         }, 1500);
       }
     };
- 
+
     recognition.onerror = (event) => {
       clearTimeout(silenceTimer);
       stopMic();
@@ -1086,16 +1257,16 @@
         showUnsupported('Microphone access denied. Check your browser settings.');
       }
     };
- 
+
     recognition.onend = () => {
       // Only reset UI if we're still in recording state
       // (prevents double-stop when stopMic already called)
       if (isRecording) stopMic();
     };
- 
+
     recognition.start();
   }
- 
+
   function stopMic() {
     isRecording = false;
     const btn = document.getElementById('mic-btn');
@@ -1104,14 +1275,14 @@
     document.getElementById('input').placeholder = 'Ask Luna about wood types, assembly, item codes, defects...';
     try { recognition?.stop(); } catch(e) {}
   }
- 
+
   function showUnsupported(msg) {
     const toast = document.getElementById('voice-unsupported');
     toast.textContent = '🚫 ' + (msg || 'Voice not supported — try Chrome or Edge');
     toast.style.display = 'block';
     setTimeout(() => { toast.style.display = 'none'; }, 3500);
   }
- 
+
   let keySeq = [];
   document.addEventListener('keydown', (e) => {
     keySeq.push(e.key);
@@ -1124,7 +1295,7 @@
       document.getElementById('log-overlay').classList.add('show');
     }
   });
- 
+
   // Ctrl+Shift+L shortcut
   document.addEventListener('keydown', (e) => {
     if (e.ctrlKey && e.shiftKey && e.key === 'L') {
